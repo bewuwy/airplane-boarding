@@ -44,6 +44,10 @@ def main():
     _VARS["pt"] = passengersType = config.get("passengers", "type") or "random"
     _VARS["p_opts"] = {}
     _VARS["p_opts"]["section_width"] = int(config.get("sections", "width"))
+    _VARS["p_opts"]["packing_time"] = int(config.get("passengers", "packingTime"))
+
+    _VARS["t_opts"] = {}
+    _VARS["t_opts"]["barging_time"] = int(config.get("passengers", "bargingTime"))
 
     _VARS["dims"] = (m, n, corridor)
     _VARS["t"] = next_((0, plane.getGrid(m, n), plane.getPassengers(m, n, corridor, passengersType, _VARS["p_opts"])))
@@ -85,7 +89,7 @@ def next_(t):
     drawTurnNumber(t[0])
     drawText("Type: " + _VARS["pt"], WIDTH - 3 * PADDING[0], (PADDING[1] / 4))
 
-    t = plane.next_turn(t[2], t[0], t[1], corridor)
+    t = plane.next_turn(t[2], t[0], t[1], corridor, _VARS["t_opts"])
 
     drawGrid(m, n)
     for i in range(m):
@@ -97,9 +101,15 @@ def next_(t):
 
             if s[0] == "occupied":
                 drawRect(i, j, (m, n), (69, 179, 224))  # blue
+                for p in s[1]:
+                    if p.toWait > 0:
+                        drawRect(i, j, (m, n), (171, 209, 0))  # yellow
+                        drawTextGrid(i, j + 0.2, (m, n), f"{p.toWait} left")
+
+                        break
+
                 for p in range(len(s[1])):
                     drawTextGrid(i, j + p * 0.4, (m, n), s[1][p].ticket())
-                    # drawTextGrid(i, j + p * 0.4 + 0.2, (m, n), s[1][p].idleTime)
             elif s[0] == 'packing':
                 drawRect(i, j, (m, n), (201, 29, 62))  # red
                 drawTextGrid(i, j, (m, n), s[1].ticket())
