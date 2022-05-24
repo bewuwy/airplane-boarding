@@ -1,4 +1,5 @@
 import pprint
+import random
 from random import randrange
 
 pp = pprint.PrettyPrinter(indent=4)
@@ -12,7 +13,8 @@ class Person:
         self.currentRow = -1
         self.currentSeat = -1
 
-        self.seatingTime = 1
+        self.seatingTime = random.choice(random.choices((1, 2), weights=(3, 1), k=10))  # 25% chance of 2 bags
+        self.idleTime = 0
 
         self.id = id_
 
@@ -24,11 +26,10 @@ class Person:
         if self.currentRow < 0:
             current += "off plane"
         else:
-            current += f"{chr(65 + self.currentRow)}{self.currentSeat}"
+            current += f"{self.currentRow}{chr(65 + self.currentSeat)}"
         current += ", "
 
-        s_ = f"p{self.id}({current}ticket: {chr(65 + self.ticketRow)}" \
-             f"{self.ticketSeat}, until seat: {self.seatingTime})"
+        s_ = f"p{self.id}({current}ticket: {self.ticket()})"
 
         return s_
 
@@ -36,19 +37,55 @@ class Person:
         return self.currentRow == self.ticketRow and self.currentSeat == self.ticketSeat
 
     def ticket(self):
-        if self.ticketRow < 26:
-            return f"{chr(65 + self.ticketRow)}{self.ticketSeat}"
+        if self.ticketSeat < 26:
+            return f"{self.ticketRow+1}{chr(65 + self.ticketSeat)}"
         else:
-            return f"{chr(65 + self.ticketRow//26 - 1)}{chr(65 + self.ticketRow - 26)}{self.ticketSeat}"
+            return f"{self.ticketRow+1}{chr(65 + self.ticketSeat//26 - 1)}{chr(65 + self.ticketSeat - 26)}"
 
 
-def getPassengers(a, b, cy):  # generate random people
+def getPassengers(a, b, cy, type_, opts=None):  # generate random people
+    if opts is None:
+        opts = {}
+
     p = []
+    if type_ == "random":
+        for i in range(b):
+            if i != cy:
+                for j in range(a):
+                    p.insert(randrange(len(p) + 1), Person(j, i, str(j) + str(i)))
+    elif type_ == "seat":
+        for i in range(b):
+            if i != cy:
+                i_ = list(range(0, a))
+                random.shuffle(i_)
 
-    for i in range(b):
-        if i != cy:
-            for j in range(a):
-                p.insert(randrange(len(p) + 1), Person(j, i, str(j) + str(i)))
+                for j in range(a):
+                    if i > cy:
+                        p.append(Person(i_[j], b-i+cy, str(j) + str(i)))
+                    else:
+                        p.append(Person(i_[j], i, str(j) + str(i)))
+    elif type_ == "section":
+        section_width = 6
+        if "section_width" in opts:
+            section_width = opts["section_width"]
+
+        def chunks(lst, n_):
+            """Yield successive n-sized chunks from lst."""
+            for i__ in range(0, len(lst), n_):
+                yield lst[i__:i__ + n_]
+
+        sections = list(chunks(list(range(0, a)), section_width))
+        sections.reverse()
+
+        for s in sections:
+            sp = []
+            for column in range(len(s)):
+                for row in range(b):
+                    if row != cy:
+                        # print(Person(s[column], row, str(s[column]) + str(row)))
+                        sp.insert(randrange(len(sp) + 1), Person(s[column], row, str(s[column]) + str(row)))  # a-i-1
+
+            p.extend(sp)
 
     return p
 
@@ -79,9 +116,7 @@ def checkIfAllSeated(grid_):
     return True
 
 
-def checkPlaceStatus(grid_, row, seat):
-    corridor = len(grid_[0]) // 2
-
+def checkPlaceStatus(grid_, row, seat, corridor):
     if len(grid_[row][seat]) == 0:
         return "empty", None
     if len(grid_[row][seat]) == 1:
@@ -109,7 +144,7 @@ def movePerson(p_, row, seat, grid_):
 
 def next_turn(people_, t_num, grid_, corridor):
     toRemove = []
-    print(f"turn {t_num + 1}")
+    # print(f"turn {t_num}")
 
     for p in people_:
         if p.currentRow < 0:  # person not on plane yet
@@ -117,6 +152,7 @@ def next_turn(people_, t_num, grid_, corridor):
                 grid_ = movePerson(p, 0, corridor, grid_)
                 continue
             else:  # entrance taken
+                p.idleTime += 1
                 continue
 
         if p.currentRow >= 0:  # person already on plane
@@ -134,14 +170,18 @@ def next_turn(people_, t_num, grid_, corridor):
                     # something to pack
                     p.seatingTime -= 1
                     continue
-                if checkIfPlaceEmpty(grid_, p.currentRow, toMoveY):  # if seat left/right of current seat empty
+                elif checkIfPlaceEmpty(grid_, p.currentRow, toMoveY):  # if seat left/right of current seat empty
                     grid_ = movePerson(p, p.currentRow, toMoveY, grid_)
                     continue
+                else:  # if seat left/right of current seat taken
+                    p.idleTime += 1
 
-            if p.currentRow != p.ticketRow:  # person not in a correct row
+            elif p.currentRow != p.ticketRow:  # person not in a correct row
                 if checkIfPlaceEmpty(grid_, p.currentRow + 1, p.currentSeat):  # if next place in the corridor empty
                     grid_ = movePerson(p, p.currentRow + 1, p.currentSeat, grid_)
                     continue
+                else:  # standing idle
+                    p.idleTime += 1
 
     for i_ in toRemove:
         people_.remove(i_)
@@ -154,23 +194,66 @@ def next_turn(people_, t_num, grid_, corridor):
 
 
 if __name__ == '__main__':
-    m, n = 6 + 1, 3  # +1 in m because of corridor
-    corridorY = 3
+    m, n = 8 + 1, 43  # +1 in m because of corridor
+    corridorY = 4
+    types = ["random", "seat", ["section", {"section_width": 6}], ["section", {"section_width": 3}],
+             ["section", {"section_width": 12}], ["section", {"section_width": 24}]]
+    s_opt = {"section_width": 6}
+    tests = 100
 
-    grid = getGrid(n, m)
-    print(grid)
+    all_results = {}
+    for t in types:
+        print()
+        results = []
+
+        if isinstance(t, list):
+            if t[0] == "section":
+                s_opt = t[1]
+                t = "section"
+
+        for i in range(tests):
+            print(f"{i+1}/{tests}", end='\r')
+
+            people = getPassengers(n, m, corridorY, t, s_opt)
+            t_num = 0
+            grid = getGrid(n, m)
+
+            while people:
+                t_num, grid, people = next_turn(people, t_num, grid, corridorY)
+
+            # print(t_num, end='\r')
+            results.append(t_num)
+
+        if t == "section":
+            t += " (width " + str(s_opt["section_width"]) + ")"
+
+        print(f"\nresults for {t} passengers distribution ({tests} tests):")
+        print(f"average: {sum(results) / tests}")
+        print(f"range: {min(results)}-{max(results)}")
+
+        all_results[sum(results) / tests] = t
+
+    best_results = list(all_results.keys())
+    best_results.sort()
+
+    print()
+    for i in range(min(len(best_results), 5)):
+        print(f"{i+1}.: {all_results[best_results[i]]} - {best_results[i]}")
+
+    quit()
 
     # people = [Person(0, 0, 1), Person(2, 1, 2), Person(1, 2, 3)]  # person  - [x, y]
-    people = getPassengers(n, m, corridorY)
+    people = getPassengers(n, m, corridorY, types[0])
 
-    print("People list:\n")
-    pp.pprint(people)
-    print(f"{len(people)} passengers")
+    # print("People list:\n")
+    # pp.pprint(people)
+    # print(f"{len(people)} passengers")
 
-    print("\nTurns: \n")
+    # print("\nTurns: \n")
+    grid = getGrid(n, m)
     t = [0, grid, people]
     while people:  # 3 test turns
         t = next_turn(t[2], t[0], t[1], corridorY)
 
     # finished seating
-    print(t)
+    print(t[0])
