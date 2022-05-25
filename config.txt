@@ -12,3 +12,8 @@ bargingTime = 1
 
 [sections]
 width = 6
+
+[window]
+fullscreen = True
+width = 1920
+height = 1080

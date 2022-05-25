@@ -227,6 +227,8 @@ if __name__ == '__main__':
 
     s_opt = {"section_width": 6}
     tests = 100
+    
+    print(f"plane with {n} rows and {m} seats, corridor at {corridorY}")
 
     all_results = {}
     for t in types:
@@ -249,7 +251,7 @@ if __name__ == '__main__':
             t = t[0]
 
         for i in range(tests):
-            print(f"{i+1}/{tests}", end='\r')
+            print(f"{i+1}/{tests} {t}", end='\r')
 
             people = getPassengers(n, m, corridorY, t, s_opt)
             t_num = 0

@@ -5,13 +5,19 @@ from pygame.locals import KEYDOWN, K_q, K_RIGHT, K_SPACE, K_UP, K_DOWN, K_LEFT, 
 import os
 import configparser
 
+
+# load config
+config = configparser.RawConfigParser()
+configFilePath = r'config.txt'
+config.read(configFilePath)
+
 if os.name == 'nt':
     import ctypes
 
     user32 = ctypes.windll.user32
     screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
 else:
-    screensize = (1024, 768)
+    screensize = (int(config.get("window", "width")), int(config.get("window", "height")))
 
 # CONSTANTS:
 SCREENSIZE = WIDTH, HEIGHT = screensize  # 1920, 1080  # 1024, 768
@@ -29,12 +35,11 @@ font = pygame.font.SysFont('Sans Serif', 26)
 def main():
     pygame.init()
 
-    _VARS['surf'] = pygame.display.set_mode(SCREENSIZE)
-
-    # load config
-    config = configparser.RawConfigParser()
-    configFilePath = r'config.txt'
-    config.read(configFilePath)
+    fullscreen = config.get("window", "fullscreen")
+    if fullscreen == "True":
+        _VARS['surf'] = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+    else:
+        _VARS['surf'] = pygame.display.set_mode(SCREENSIZE)
 
     print(config.get("passengers", "type"))
 
