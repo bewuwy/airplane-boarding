@@ -1,8 +1,7 @@
 import sys
 import pygame
-import plane
+import boarding
 from pygame.locals import KEYDOWN, K_q, K_RIGHT, K_SPACE, K_UP, K_DOWN, K_LEFT, K_RETURN, K_r, K_7, K_8, K_9
-import os
 import configparser
 
 
@@ -51,16 +50,20 @@ def main():
     # _VARS["dims"] = (m, n, corridor)
     # _VARS["t"] = next_((0, plane.getGrid(m, n), plane.getPassengers(m, n, corridor, passengersType, _VARS["p_opts"])))
     
-    _VARS["plane"] = plane.Plane(m, n, corridor)
-    _VARS["plane"].getPassengers(_VARS["pt"])
+    _VARS["plane"] = boarding.Plane(m, n, corridor)
+    _VARS["plane"].createPassengers(_VARS["pt"])
     
     while True:
         checkEvents()
         _VARS['surf'].fill(GREY)
 
-        if _VARS['auto'] and _VARS["auto_time"] > 0:
-            drawText(str(round(1 / (_VARS["auto_time"] / 1000), 1)) + " turns/s", 
-                     WIDTH - 2.5 * PADDING[0], HEIGHT - (PADDING[1] / 2))
+        if _VARS['auto']:
+            if _VARS["auto_time"] > 0:
+                t = str(round(1 / (_VARS["auto_time"] / 1000), 1)) + " turns/s"
+            else:
+                t = "FAST"
+
+            drawText(t, WIDTH - 2.5 * PADDING[0], HEIGHT - (PADDING[1] / 2))
 
         # pygame.display.update()
 
@@ -132,8 +135,8 @@ def reset():
     # _VARS["t"] = next_((0, plane.getGrid(_VARS["dims"][0], _VARS["dims"][1]), plane.getPassengers(_VARS["dims"][0],
     #                    _VARS["dims"][1], _VARS["dims"][2], _VARS["pt"], _VARS["p_opts"])))
     
-    _VARS["plane"] = plane.Plane(_VARS["plane"].m, _VARS["plane"].n, _VARS["plane"].corridorSeat)
-    _VARS["plane"].getPassengers(_VARS["pt"])
+    _VARS["plane"] = boarding.Plane(_VARS["plane"].m, _VARS["plane"].n, _VARS["plane"].corridorSeat)
+    _VARS["plane"].createPassengers(_VARS["pt"])
     
     _VARS["end"] = False
     next_()
