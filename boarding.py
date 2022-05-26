@@ -6,7 +6,7 @@ pp = pprint.PrettyPrinter(indent=4)
 
 
 class Person:
-    def __init__(self, ticket_row, ticket_seat, id_=0, seating_time=None):
+    def __init__(self, ticket_row, ticket_seat, corridors=(), id_=0, seating_time=None):
         self.ticketRow = ticket_row
         self.ticketSeat = ticket_seat
 
@@ -19,6 +19,20 @@ class Person:
         self.seatingTime = seating_time
         self.toWait = 0
         self.idleTime = 0
+
+        self.entranceCorridors = []
+        if self.ticketSeat > corridors[-1]:
+            self.entranceCorridors.append(corridors[-1])
+        elif self.ticketSeat < corridors[0]:
+            self.entranceCorridors.append(corridors[0])
+        else:
+            for e in range(len(corridors)):
+                self.entranceCorridors.append(corridors[e])
+                if len(self.entranceCorridors) > 2:
+                    self.entranceCorridors.pop(0)
+
+                if corridors[e] > self.ticketSeat:
+                    break
 
         self.id = id_
 
@@ -48,9 +62,9 @@ class Person:
 
 
 class Plane:
-    def __init__(self, m, n, corridor_y):
+    def __init__(self, m, n, corridors):
         self.grid = []
-        self.corridorSeat = corridor_y
+        self.corridors = corridors
         self.passengers = []
 
         self.m = m
@@ -78,19 +92,20 @@ class Plane:
         p = []  # passengers list
         if type_ == "random":  # random passengers distribution 
             for seat in range(self.m):
-                if seat != self.corridorSeat:
+                if seat not in self.corridors:
                     for row in range(self.n):
-                        p.insert(randrange(len(p) + 1),
-                                 Person(row, seat, str(row) + str(seat), packing_time))
+                        p_ = Person(row, seat, self.corridors, str(row) + str(seat), packing_time)
+
+                        p.insert(randrange(len(p) + 1), p_)
 
         elif type_ == "seat":  # seat-based passengers distribution
             for seat in range(self.m):
-                if seat != self.corridorSeat:
+                if seat not in self.corridors:
                     i_ = list(range(0, self.n))
                     random.shuffle(i_)
 
                     for row in range(self.n):
-                        if seat > self.corridorSeat:
+                        if seat > self.corridorSeat:  # TODO: multiple corridors
                             p.append(
                                 Person(i_[row], self.m - seat + self.corridorSeat, str(row) + str(seat), packing_time))
                         else:
@@ -109,9 +124,10 @@ class Plane:
                 sp = []  # section passengers
                 for row in range(len(s)):
                     for seat in range(self.m):
-                        if seat != self.corridorSeat:
+                        if seat not in self.corridors:
                             # print(Person(s[column], row, str(s[column]) + str(row)))
-                            sp.insert(randrange(len(sp) + 1), Person(s[row], seat, str(s[row]) + str(seat)))  # a-i-1
+                            sp.insert(randrange(len(sp) + 1),
+                                      Person(s[row], seat, self.corridors, str(s[row]) + str(seat)))
 
                 p.extend(sp)
 
@@ -119,7 +135,8 @@ class Plane:
 
     def checkIfPlaceEmpty(self, row, seat):
         if len(self.grid[seat][row]) == 0 or \
-                (len(self.grid[seat][row]) == 1 and self.grid[seat][row][0].check_seated()):
+                (len(self.grid[seat][row]) == 1 and self.grid[seat][row][0].check_seated()) or \
+                (len(self.grid[seat][row]) < 2 and seat not in self.corridors):  # swapping places not in corridors
 
             return True
         else:
@@ -131,7 +148,7 @@ class Plane:
         if len(self.grid[seat][row]) == 1:
             if self.grid[seat][row][0].check_seated():
                 return "boarded", self.grid[seat][row][0]
-            elif row == self.grid[seat][row][0].ticketRow and seat == self.corridorSeat:
+            elif row == self.grid[seat][row][0].ticketRow and seat in self.corridors:
                 return "packing", self.grid[seat][row][0]
 
         return "standing", self.grid[seat][row]
@@ -139,7 +156,7 @@ class Plane:
     def checkIfAllSeated(self):
         for seat in self.grid:
             for place in seat:
-                if place[0].check_seated() == False:
+                if not place[0].check_seated():
                     return False
         return True
 
@@ -171,17 +188,16 @@ class Plane:
         if "barging_time" in options:
             barging_time = options["barging_time"]
 
-        # print(f"turn {t_num}")
-
         toRemove = []
         for p in self.passengers:  # trying to move every passenger
             if p.currentRow < 0:  # person not on plane yet
-                if self.checkIfPlaceEmpty(0, self.corridorSeat):  # entrance empty
-                    self.movePerson(p, 0, self.corridorSeat)
-                    continue
-                else:  # entrance taken
-                    p.idleTime += 1
-                    continue
+                for corridor in p.entranceCorridors:
+                    if self.checkIfPlaceEmpty(0, corridor):  # entrance empty
+                        self.movePerson(p, 0, corridor)
+                        continue
+                    else:  # entrance taken
+                        p.idleTime += 1
+                        continue
 
             if p.currentRow >= 0:  # person already on plane
                 if p.currentRow == p.ticketRow:  # person in a correct row
@@ -189,12 +205,12 @@ class Plane:
                         toRemove.append(p)
                         continue
 
-                    if p.ticketSeat < self.corridorSeat:
+                    if p.ticketSeat < p.currentSeat:
                         toMoveY = p.currentSeat - 1
                     else:
                         toMoveY = p.currentSeat + 1
 
-                    if p.currentSeat == self.corridorSeat and p.seatingTime > 0:
+                    if p.currentSeat in self.corridors and p.seatingTime > 0:
                         # if person in the corridor and still has something to pack
                         p.seatingTime -= 1
                         continue

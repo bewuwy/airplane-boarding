@@ -36,8 +36,9 @@ def main():
     print(config.get("passengers", "type"))
 
     m, n = int(config.get("aeroplane", "seats")), int(config.get("aeroplane", "rows"))
-    corridor = config.get("aeroplane", "corridor") or n // 2
-    corridor = int(corridor)
+    corridors = config.get("aeroplane", "corridors").split(",")
+    for i in range(len(corridors)):
+        corridors[i] = int(corridors[i])
     
     _VARS["pt"] = passengersType = config.get("passengers", "type") or "random"
     _VARS["p_opts"] = {}
@@ -47,10 +48,7 @@ def main():
     _VARS["t_opts"] = {}
     _VARS["t_opts"]["barging_time"] = int(config.get("passengers", "bargingTime"))
 
-    # _VARS["dims"] = (m, n, corridor)
-    # _VARS["t"] = next_((0, plane.getGrid(m, n), plane.getPassengers(m, n, corridor, passengersType, _VARS["p_opts"])))
-    
-    _VARS["plane"] = boarding.Plane(m, n, corridor)
+    _VARS["plane"] = boarding.Plane(m, n, corridors)
     _VARS["plane"].createPassengers(_VARS["pt"])
     
     while True:
@@ -68,20 +66,6 @@ def main():
         # pygame.display.update()
 
 
-# def prev_():
-#     if len(turns) < 3 or _VARS["t"][0] < 2:
-#         return
-# 
-#     _VARS["auto"] = False
-# 
-#     print("prev to", turns[1][0])
-#     if not _VARS["end"] and 1 in turns:
-#         print(turns[1])
-#         next_(turns[1])  # _VARS['t'][0]-2
-# 
-#     return
-
-
 def next_():
     plane = _VARS["plane"]
     
@@ -90,7 +74,7 @@ def next_():
         _VARS['end'] = True
         return
     
-    m, n, cy = plane.m, plane.n, plane.corridorSeat
+    m, n, corridors = plane.m, plane.n, plane.corridors
     # m, n, corridor = _VARS["dims"]
 
     drawTurnNumber(plane.turn)
@@ -99,8 +83,9 @@ def next_():
     t = plane.next_turn(_VARS["t_opts"])
 
     drawGrid(n, m)
-    for i in range(n):  # draw corridor in black
-        drawRect(cy, i)
+    for c in corridors:
+        for i in range(n):  # draw corridor in black
+            drawRect(c, i)
 
     for seat in range(len(plane.grid)):
         for row in range(len(plane.grid[seat])):
@@ -117,7 +102,7 @@ def next_():
 
                 for p in range(len(status[1])):
                     drawTextGrid(seat + p * 0.4, row, status[1][p].ticket())
-                    
+
             elif status[0] == 'packing':  # drawing a person packing
                 drawRect(seat, row, (201, 29, 62))  # red
                 drawTextGrid(seat, row, status[1].ticket())
@@ -135,7 +120,7 @@ def reset():
     # _VARS["t"] = next_((0, plane.getGrid(_VARS["dims"][0], _VARS["dims"][1]), plane.getPassengers(_VARS["dims"][0],
     #                    _VARS["dims"][1], _VARS["dims"][2], _VARS["pt"], _VARS["p_opts"])))
     
-    _VARS["plane"] = boarding.Plane(_VARS["plane"].m, _VARS["plane"].n, _VARS["plane"].corridorSeat)
+    _VARS["plane"] = boarding.Plane(_VARS["plane"].m, _VARS["plane"].n, _VARS["plane"].corridors)
     _VARS["plane"].createPassengers(_VARS["pt"])
     
     _VARS["end"] = False

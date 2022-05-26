@@ -1,7 +1,7 @@
 [aeroplane]
 rows = 33
 seats = 7
-corridor = 3
+corridors = 3
 
 [passengers]
 # types - random, seat, section
