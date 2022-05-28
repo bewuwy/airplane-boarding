@@ -28,7 +28,8 @@ if __name__ == "__main__":
     all_results = {}
     for t in test_types:
         print()
-        results = []
+        turnResults = []
+        percentileResults = {"bottom": [], "top": []}
         t_opts = {}
         s_opt = {}
 
@@ -46,26 +47,33 @@ if __name__ == "__main__":
             t = t[0]
 
         for i in range(tests):
-            print(f"{i + 1}/{tests} {t}", end='\r')
+            # print(f"{i + 1}/{tests} {t}") # , end='\r')
 
             plane = Plane(m, n, corridors)
             plane.createPassengers(t, s_opt)
 
             t_num = 0
             while plane.passengers:
-                t_num = plane.next_turn(t_opts)
+                t_num, percentile = plane.next_turn(t_opts)
                 
-            results.append(t_num)
+            turnResults.append(t_num)
+            percentileResults["bottom"].append(percentile[0])
+            percentileResults["top"].append(percentile[1])
 
         if t == "section":
             t += " (width " + str(s_opt["section_width"]) + ")"
 
         print(f"\nresults for {t} passengers distribution ({tests} tests):")
-        print(f"average: {sum(results) / tests}")
-        print(f"range: {min(results)}-{max(results)}")
+        print(f"average turns: {sum(turnResults) / tests}")
+        print(f"turns range: {min(turnResults)}-{max(turnResults)}")
+        print(f"average bottom percentile: {sum(percentileResults['bottom']) / tests}")
+        print(f"average top percentile: {sum(percentileResults['top']) / tests}")
         print(t_opts, s_opt)
+        
+        # print("turn results:")
+        # print(turnResults)
 
-        all_results[sum(results) / tests] = t
+        all_results[sum(turnResults) / tests] = t
 
     best_results = list(all_results.keys())
     best_results.sort()

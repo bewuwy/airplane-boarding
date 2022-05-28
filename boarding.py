@@ -1,8 +1,5 @@
-import pprint
 import random
 from random import randrange
-
-pp = pprint.PrettyPrinter(indent=4)
 
 
 class Person:
@@ -77,6 +74,22 @@ class Plane:
             for row in range(n):
                 t_.append([])
             self.grid.append(t_)
+            
+        self.idleList = []
+        
+    def calculatePercentile(self, bottom=0.05, top=0.95):
+        self.idleList.sort()
+        
+        len_ = len(self.idleList)
+        
+        if len_ == 0:
+            return 0, 0
+        
+        bottomPercentile = self.idleList[int(len_ * bottom)]
+        topPercentile = self.idleList[int(len_ * top)]
+        
+        return bottomPercentile, topPercentile
+        
 
     def createPassengers(self, type_, options=None):  # generate random people
         packing_time = None
@@ -252,9 +265,12 @@ class Plane:
 
         for p_ in toRemove:
             self.passengers.remove(p_)
+            self.idleList.append(p_.idleTime)
+            
             # grid_[i_.currentRow][i_.currentSeat] = 0
 
         self.turn += 1  # increment number of turns
-        # pp.pprint(grid_)
 
-        return self.turn  # t_num, grid_, people_
+        percentile = self.calculatePercentile()
+
+        return self.turn, percentile  # t_num, grid_, people_
