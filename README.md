@@ -3,7 +3,7 @@ airplane boarding simulator in python
 
 ## Installation
 
-You need to have python 3 and pip installed, then run:
+You need to have **Python 3** and **pip** installed, then run:
 
 ```
 pip install -r requirements.txt
@@ -15,9 +15,39 @@ pip install -r requirements.txt
 
 Edit the config.txt to manipulate the plane dimensions, passengers distribution and passengers' variables
 
-### GUI Version
+#### Tests config
+
+Edit the tests.txt to change types of tests and number of each of them.
+
+The *tests* variable can bet set to list of test types (*separated by commas*).
+For example:
+```
+tests = "random", "seat", ["section", {"section_width": 3}]
+```
+
+**Test types**:
+- **random** - random passenger distribution
+- **seat** - seat (distance from corridor) based distribution
+- **section** - random passenger distribution by sections of given width
+  - This test type can be set with a *section_width* variable.
+
+### Tests version
+
+To use the version without display, **run tests.py**
+
+```
+python tests.py
+```
+
+But first, make sure to set up tests in **tests.txt**.
+
+### GUI version
 
 To use the version with GUI, **run gui.py**
+
+```
+python gui.py
+```
 
 #### Colours meaning
 
