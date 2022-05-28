@@ -1,0 +1,4 @@
+[tests]
+
+n = 5
+types = "random", "seat", ["section", {"section_width": 6}], ["section", {"section_width": 3}], ["section", {"section_width": 12}]

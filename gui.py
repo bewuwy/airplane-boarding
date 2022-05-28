@@ -35,8 +35,8 @@ def main():
 
     print(config.get("passengers", "type"))
 
-    m, n = int(config.get("aeroplane", "seats")), int(config.get("aeroplane", "rows"))
-    corridors = config.get("aeroplane", "corridors").split(",")
+    m, n = int(config.get("airplane", "seats")), int(config.get("airplane", "rows"))
+    corridors = config.get("airplane", "corridors").split(",")
     for i in range(len(corridors)):
         corridors[i] = int(corridors[i])
     

@@ -1,4 +1,4 @@
-[aeroplane]
+[airplane]
 rows = 33
 seats = 7
 corridors = 3
