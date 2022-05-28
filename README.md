@@ -21,23 +21,23 @@ To use the version with GUI, **run gui.py**
 
 #### Colours meaning
 
-Blue -> moving/idle
-Red -> packing luggage - text *n left* is number of turns left to complete packing
-Yellow -> barging through a filled seat - text *n left* is number of turns left to complete barging through
-Green -> passenger fully boarded - text under the passenger's ticket is the passenger's idle counter - number of turns spent idle
+- Blue -> moving/idle
+- Red -> packing luggage - text *n left* is number of turns left to complete packing
+- Yellow -> barging through a filled seat - text *n left* is number of turns left to complete barging through
+- Green -> passenger fully boarded - text under the passenger's ticket is the passenger's idle counter - number of turns spent idle
 
 #### Controls
 
-Enter -> fast forward to end
-Right arrow -> next turn
+- Enter -> fast forward to end
+- Right arrow -> next turn
 
-Space -> auto play turns
-Up arrow -> faster auto turns
-Down arrow -> slower auto turns
+- Space -> auto play turns
+- Up arrow -> faster auto turns
+- Down arrow -> slower auto turns
 
-R -> restart with new passengers
-7 -> restart with new passengers in *random* distribution mode
-8 -> restart with new passengers in *seat* distribution mode
-9 -> restart with new passengers in *section* distribution mode
+- R -> restart with new passengers
+- 7 -> restart with new passengers in *random* distribution mode
+- 8 -> restart with new passengers in *seat* distribution mode
+- 9 -> restart with new passengers in *section* distribution mode
 
-Q -> quit program
+- Q -> quit program
