@@ -40,16 +40,18 @@ def main():
     for i in range(len(corridors)):
         corridors[i] = int(corridors[i])
     
-    _VARS["pt"] = passengersType = config.get("passengers", "type") or "random"
+    _VARS["pt"] = config.get("passengers", "type") or "random"
     _VARS["p_opts"] = {}
     _VARS["p_opts"]["section_width"] = int(config.get("sections", "width"))
-    _VARS["p_opts"]["packing_time"] = int(config.get("passengers", "packingTime"))
+    _VARS["p_opts"]["packing_time"] = []
+    for i in config.get("passengers", "packingTime").split(", "):
+        _VARS["p_opts"]["packing_time"].append(int(i))
 
     _VARS["t_opts"] = {}
     _VARS["t_opts"]["barging_time"] = int(config.get("passengers", "bargingTime"))
 
     _VARS["plane"] = boarding.Plane(m, n, corridors)
-    _VARS["plane"].createPassengers(_VARS["pt"])
+    _VARS["plane"].createPassengers(_VARS["pt"], _VARS["p_opts"])
     
     while True:
         checkEvents()

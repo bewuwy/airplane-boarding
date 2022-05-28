@@ -3,6 +3,20 @@ import configparser
 import json
 
 
+def calculatePercentile(list_, bottom=0.05, top=0.95):
+        list_.sort()
+        
+        len_ = len(list_)
+        
+        if len_ == 0:
+            return 0, 0
+        
+        bottomPercentile = list_[int(len_ * bottom)]
+        topPercentile = list_[int(len_ * top)]
+        
+        return bottomPercentile, topPercentile
+
+
 if __name__ == "__main__":
     # load config
     config = configparser.RawConfigParser()
@@ -22,6 +36,10 @@ if __name__ == "__main__":
         test_types.append(i)
 
     tests = int(testsCfg.get("tests", "n"))
+    
+    packing_time = []
+    for i in config.get("passengers", "packingTimes").split(","):
+        packing_time.append(int(i))
 
     print(f"plane with {n} rows and {m} seats, corridors at {corridors}")
 
@@ -36,8 +54,7 @@ if __name__ == "__main__":
         if isinstance(t, list):
             if "barging_time" in t[1]:
                 barging_time = t[1]["barging_time"]
-                t_opts = {"barging_time": barging_time}
-
+                t_opts["barging_time"] = barging_time
             if t[0] == "section":
                 s_opt = t[1]
             if "packing_time" in t[1]:
@@ -54,9 +71,10 @@ if __name__ == "__main__":
 
             t_num = 0
             while plane.passengers:
-                t_num, percentile = plane.next_turn(t_opts)
+                t_num, boardingTimeList = plane.next_turn(t_opts)
                 
             turnResults.append(t_num)
+            percentile = calculatePercentile(boardingTimeList)
             percentileResults["bottom"].append(percentile[0])
             percentileResults["top"].append(percentile[1])
 
@@ -64,10 +82,10 @@ if __name__ == "__main__":
             t += " (width " + str(s_opt["section_width"]) + ")"
 
         print(f"\nresults for {t} passengers distribution ({tests} tests):")
-        print(f"average turns: {sum(turnResults) / tests}")
-        print(f"turns range: {min(turnResults)}-{max(turnResults)}")
-        print(f"average bottom percentile: {sum(percentileResults['bottom']) / tests}")
-        print(f"average top percentile: {sum(percentileResults['top']) / tests}")
+        print(f"average total time: {sum(turnResults) / tests}")
+        print(f"total time range: {min(turnResults)}-{max(turnResults)}")
+        print(f"average boarding time bottom percentile: {sum(percentileResults['bottom']) / tests}")
+        print(f"average boarding time top percentile: {sum(percentileResults['top']) / tests}")
         print(t_opts, s_opt)
         
         # print("turn results:")
@@ -75,9 +93,9 @@ if __name__ == "__main__":
 
         all_results[sum(turnResults) / tests] = t
 
-    best_results = list(all_results.keys())
-    best_results.sort()
+    # best_results = list(all_results.keys())
+    # best_results.sort()
 
-    print()
-    for i in range(min(len(best_results), 5)):
-        print(f"{i + 1}.: {all_results[best_results[i]]} - {best_results[i]}")
+    # print()
+    # for i in range(min(len(best_results), 5)):
+    #     print(f"{i + 1}.: {all_results[best_results[i]]} - {best_results[i]}")

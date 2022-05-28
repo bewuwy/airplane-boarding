@@ -3,19 +3,27 @@ from random import randrange
 
 
 class Person:
-    def __init__(self, ticket_row, ticket_seat, corridors=(), id_=0, seating_time=None):
+    def __init__(self, ticket_row, ticket_seat, options=None, corridors=(), id_=None):
+        packing_time = None
+        if options is None:
+            options = {}
+        if "packing_time" in options:
+            packing_time = options["packing_time"]
+        
         self.ticketRow = ticket_row
         self.ticketSeat = ticket_seat
 
         self.currentRow = -1
         self.currentSeat = -1
 
-        if seating_time is None:
-            seating_time = random.choice(random.choices((2, 3, 4), weights=(2, 2, 1), k=10))
+        if packing_time is None:
+            packing_time = random.choice(random.choices((2, 3, 4), weights=(2, 2, 1), k=10))
 
-        self.seatingTime = seating_time
+        self.seatingTime = packing_time
         self.toWait = 0
+        
         self.idleTime = 0
+        self.boardingTime = 0
 
         self.entranceCorridors = []
         if self.ticketSeat > corridors[-1]:
@@ -31,6 +39,8 @@ class Person:
                 if corridors[e] > self.ticketSeat:
                     break
 
+        if id_ is None:
+            id_ = str(self.ticketRow) + str(self.ticketSeat)
         self.id = id_
 
     def __repr__(self):
@@ -57,7 +67,6 @@ class Person:
         else:
             return f"{self.ticketRow + 1}{chr(65 + self.ticketSeat // 26 - 1)}{chr(65 + self.ticketSeat - 26)}"
 
-
 class Plane:
     def __init__(self, m, n, corridors):
         self.grid = []
@@ -76,23 +85,10 @@ class Plane:
             self.grid.append(t_)
             
         self.idleList = []
+        self.boardingTimeList = []
         
-    def calculatePercentile(self, bottom=0.05, top=0.95):
-        self.idleList.sort()
-        
-        len_ = len(self.idleList)
-        
-        if len_ == 0:
-            return 0, 0
-        
-        bottomPercentile = self.idleList[int(len_ * bottom)]
-        topPercentile = self.idleList[int(len_ * top)]
-        
-        return bottomPercentile, topPercentile
-        
-
     def createPassengers(self, type_, options=None):  # generate random people
-        packing_time = None
+        packing_time = [3, 3, 3, 4]
         section_width = 6
 
         if options is None:
@@ -107,7 +103,8 @@ class Plane:
             for seat in range(self.m):
                 if seat not in self.corridors:
                     for row in range(self.n):
-                        p_ = Person(row, seat, self.corridors, str(row) + str(seat), packing_time)
+                        p_ = Person(row, seat, {"packing_time": random.choice(packing_time)}, 
+                                    self.corridors)
 
                         p.insert(randrange(len(p) + 1), p_)
 
@@ -122,8 +119,8 @@ class Plane:
                         seatsFilled.append(corridor - displacement)
 
                         for row in range(self.n):
-                            p_ = Person(row, corridor - displacement, self.corridors,
-                                        str(row) + str(corridor - displacement), packing_time)
+                            p_ = Person(row, corridor - displacement, {"packing_time": random.choice(packing_time)},
+                                        self.corridors)
 
                             c_.append(p_)
 
@@ -131,8 +128,8 @@ class Plane:
                         seatsFilled.append(corridor + displacement)
 
                         for row in range(self.n):
-                            p_ = Person(row, corridor + displacement, self.corridors,
-                                        str(row) + str(corridor - displacement), packing_time)
+                            p_ = Person(row, corridor + displacement,  {"packing_time": random.choice(packing_time)}, 
+                                        self.corridors,)
 
                             c_.append(p_)
 
@@ -157,9 +154,8 @@ class Plane:
                 for row in range(len(s)):
                     for seat in range(self.m):
                         if seat not in self.corridors:
-                            # print(Person(s[column], row, str(s[column]) + str(row)))
                             sp.insert(randrange(len(sp) + 1),
-                                      Person(s[row], seat, self.corridors, str(s[row]) + str(seat)))
+                                      Person(s[row], seat, {"packing_time": random.choice(packing_time)}, self.corridors))
 
                 p.extend(sp)
 
@@ -214,14 +210,15 @@ class Plane:
 
     def next_turn(self, options=None):
         barging_time = 1
-
         if options is None:
             options = {}
         if "barging_time" in options:
             barging_time = options["barging_time"]
 
         toRemove = []
+        
         for p in self.passengers:  # trying to move every passenger
+            p.boardingTime += 1
             if p.currentRow < 0:  # person not on plane yet
                 for corridor in p.entranceCorridors:
                     if self.checkIfPlaceEmpty(0, corridor):  # entrance empty
@@ -266,11 +263,10 @@ class Plane:
         for p_ in toRemove:
             self.passengers.remove(p_)
             self.idleList.append(p_.idleTime)
+            self.boardingTimeList.append(p_.boardingTime)
             
             # grid_[i_.currentRow][i_.currentSeat] = 0
 
         self.turn += 1  # increment number of turns
 
-        percentile = self.calculatePercentile()
-
-        return self.turn, percentile  # t_num, grid_, people_
+        return self.turn, self.boardingTimeList  # t_num, grid_, people_
