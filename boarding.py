@@ -99,17 +99,36 @@ class Plane:
                         p.insert(randrange(len(p) + 1), p_)
 
         elif type_ == "seat":  # seat-based passengers distribution
-            for seat in range(self.m):
-                if seat not in self.corridors:
-                    i_ = list(range(0, self.n))
-                    random.shuffle(i_)
+            seatsFilled = self.corridors.copy()
+            displacement = 1
 
-                    for row in range(self.n):
-                        if seat > self.corridorSeat:  # TODO: multiple corridors
-                            p.append(
-                                Person(i_[row], self.m - seat + self.corridorSeat, str(row) + str(seat), packing_time))
-                        else:
-                            p.append(Person(i_[row], seat, str(row) + str(seat), packing_time))
+            while len(seatsFilled) < self.m:
+                c_ = []
+                for corridor in self.corridors:
+                    if corridor - displacement >= 0 and corridor - displacement not in seatsFilled:
+                        seatsFilled.append(corridor - displacement)
+
+                        for row in range(self.n):
+                            p_ = Person(row, corridor - displacement, self.corridors,
+                                        str(row) + str(corridor - displacement), packing_time)
+
+                            c_.append(p_)
+
+                    if corridor + displacement < self.m and corridor + displacement not in seatsFilled:
+                        seatsFilled.append(corridor + displacement)
+
+                        for row in range(self.n):
+                            p_ = Person(row, corridor + displacement, self.corridors,
+                                        str(row) + str(corridor - displacement), packing_time)
+
+                            c_.append(p_)
+
+                    random.shuffle(c_)
+                    p.extend(c_)
+
+                displacement += 1
+
+            p.reverse()
 
         elif type_ == "section":  # section-based passengers distribution
             def chunks(lst, n_):
@@ -242,17 +261,17 @@ class Plane:
 
 
 if __name__ == '__main__':
-    m, n, cy = 6 + 1, 33, 3  # +1 in m because of corridor
+    m, n, cy = 6 + 1, 33, [3]  # +1 in m because of corridor
 
-    # test_types = ["random"]
-    test_types = ["random", "seat", ["section", {"section_width": 6}], ["section", {"section_width": 3}],
-                  ["section", {"section_width": 12}]]
+    test_types = ["seat"]
+    # test_types = ["random", "seat", ["section", {"section_width": 6}], ["section", {"section_width": 3}],
+    #              ["section", {"section_width": 12}]]
     # test_types = [["random", {"barging_time": 1, "packing_time": 2}], ["random", {"barging_time": 0,
     # "packing_time": 4}]]
 
     tests = 10
 
-    print(f"plane with {n} rows and {m} seats, corridor at {cy}")
+    print(f"plane with {n} rows and {m} seats, corridors at {cy}")
 
     all_results = {}
     for t in test_types:

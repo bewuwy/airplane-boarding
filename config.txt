@@ -5,7 +5,7 @@ corridors = 3
 
 [passengers]
 # types - random, seat, section
-type = random
+type = section
 
 packingTime = 3
 bargingTime = 1
