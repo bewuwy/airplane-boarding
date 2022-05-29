@@ -4,15 +4,17 @@ seats = 7
 corridors = 3
 
 [passengers]
-# types - random, seat, section
+# distribution types - random, seat, section
 type = section
 
+# packing time is chosen at random from this list
 packingTime = 3, 3, 3, 5
 bargingTime = 1
 
 [sections]
 width = 6
 
+# application settings
 [window]
 fullscreen = True
 width = 1920

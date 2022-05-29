@@ -30,48 +30,40 @@ if __name__ == "__main__":
     for i in range(len(corridors)):
         corridors[i] = int(corridors[i])
 
-    test_types = []
-    print(testsCfg.get("tests", "types"))
+    tests = []
     for i in json.loads("[" + testsCfg.get("tests", "types") + "]"):
-        test_types.append(i)
+        tests.append(i)
+    print(tests)
 
-    tests = int(testsCfg.get("tests", "n"))
+    tests_number = int(testsCfg.get("tests", "n"))
     
     packing_time = []
-    for i in config.get("passengers", "packingTimes").split(","):
+    for i in config.get("passengers", "packingTime").split(","):
         packing_time.append(int(i))
 
     print(f"plane with {n} rows and {m} seats, corridors at {corridors}")
 
-    all_results = {}
-    for t in test_types:
+    total_time_results = {}
+    
+    for t in tests:
         print()
         turnResults = []
         percentileResults = {"bottom": [], "top": []}
-        t_opts = {}
-        s_opt = {}
+        options = {}
 
         if isinstance(t, list):
-            if "barging_time" in t[1]:
-                barging_time = t[1]["barging_time"]
-                t_opts["barging_time"] = barging_time
-            if t[0] == "section":
-                s_opt = t[1]
-            if "packing_time" in t[1]:
-                packing_time = t[1]["packing_time"]
-                s_opt["packing_time"] = packing_time
-
+            options = t[1]
             t = t[0]
 
-        for i in range(tests):
-            # print(f"{i + 1}/{tests} {t}") # , end='\r')
+        for i in range(tests_number):
+            # print(f"{i + 1}/{tests} {t}", end='\r')
 
             plane = Plane(m, n, corridors)
-            plane.createPassengers(t, s_opt)
+            plane.createPassengers(t, options)
 
             t_num = 0
             while plane.passengers:
-                t_num, boardingTimeList = plane.next_turn(t_opts)
+                t_num, boardingTimeList = plane.next_turn(options)
                 
             turnResults.append(t_num)
             percentile = calculatePercentile(boardingTimeList)
@@ -79,23 +71,27 @@ if __name__ == "__main__":
             percentileResults["top"].append(percentile[1])
 
         if t == "section":
-            t += " (width " + str(s_opt["section_width"]) + ")"
+            t += " (width " + str(options["section_width"]) + ")"
 
-        print(f"\nresults for {t} passengers distribution ({tests} tests):")
-        print(f"average total time: {sum(turnResults) / tests}")
+        print(f"\nresults for {t} passengers distribution ({tests_number} tests):")
+        print(f"average total time: {sum(turnResults) / tests_number}")
         print(f"total time range: {min(turnResults)}-{max(turnResults)}")
-        print(f"average boarding time bottom percentile: {sum(percentileResults['bottom']) / tests}")
-        print(f"average boarding time top percentile: {sum(percentileResults['top']) / tests}")
-        print(t_opts, s_opt)
+        print(f"average boarding time bottom percentile: {sum(percentileResults['bottom']) / tests_number}")
+        print(f"average boarding time top percentile: {sum(percentileResults['top']) / tests_number}")
+        print(options)
         
         # print("turn results:")
         # print(turnResults)
 
-        all_results[sum(turnResults) / tests] = t
+        total_time_results[t] = turnResults
 
-    # best_results = list(all_results.keys())
-    # best_results.sort()
-
-    # print()
-    # for i in range(min(len(best_results), 5)):
-    #     print(f"{i + 1}.: {all_results[best_results[i]]} - {best_results[i]}")
+    # dump to csv
+    with open(f"out.csv", "w") as f:
+        for i in total_time_results:
+            f.write(f"{i}, {str(total_time_results[i])[1:-1]}\n")
+            f.write("\n")
+            
+        f.write(f"range")
+        for i in range(300-5, 600+10, 5):
+            f.write(f", {i}")
+        f.write("\n")
