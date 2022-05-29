@@ -5,11 +5,14 @@ corridors = 3
 
 [passengers]
 # distribution types - random, seat, section
-type = section
+type = random
 
 # packing time is chosen at random from this list
 packingTime = 3, 3, 3, 5
 bargingTime = 1
+
+# chance for a passenger to be a line cutter
+naughtyChance = 0.05
 
 [sections]
 width = 6

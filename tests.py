@@ -18,6 +18,8 @@ def calculatePercentile(list_, bottom=0.05, top=0.95):
 
 
 if __name__ == "__main__":
+    print("\n"*3)
+    
     # load config
     config = configparser.RawConfigParser()
     config.read(r'config.txt')
@@ -25,11 +27,7 @@ if __name__ == "__main__":
     testsCfg = configparser.RawConfigParser()
     testsCfg.read(r'tests.txt')
     
-    m, n = int(config.get("airplane", "seats")), int(config.get("airplane", "rows"))
-    corridors = config.get("airplane", "corridors").split(",")
-    for i in range(len(corridors)):
-        corridors[i] = int(corridors[i])
-
+    # tests config
     tests = []
     for i in json.loads("[" + testsCfg.get("tests", "types") + "]"):
         tests.append(i)
@@ -37,33 +35,45 @@ if __name__ == "__main__":
 
     tests_number = int(testsCfg.get("tests", "n"))
     
-    packing_time = []
-    for i in config.get("passengers", "packingTime").split(","):
-        packing_time.append(int(i))
+    # plane and passengers config
+    m, n = int(config.get("airplane", "seats")), int(config.get("airplane", "rows"))
+    corridors = config.get("airplane", "corridors").split(",")
+    for i in range(len(corridors)):
+        corridors[i] = int(corridors[i])
 
+    options = {}
+    options["packing_time"] = []
+    for i in config.get("passengers", "packingTime").split(","):
+        options["packing_time"].append(int(i))
+        
+    options["barging_time"] = int(config.get("passengers", "bargingTime"))
+    options["naughty_chance"] = float(config.get("passengers", "naughtyChance"))
+
+    # loaded config
     print(f"plane with {n} rows and {m} seats, corridors at {corridors}")
 
     total_time_results = {}
-    
     for t in tests:
         print()
+        options_ = options.copy()
+        if isinstance(t, list):
+            for i in t[1]:
+                options_[i] = t[1][i]
+            
+            t = t[0]
+        
         turnResults = []
         percentileResults = {"bottom": [], "top": []}
-        options = {}
-
-        if isinstance(t, list):
-            options = t[1]
-            t = t[0]
 
         for i in range(tests_number):
-            # print(f"{i + 1}/{tests} {t}", end='\r')
+            print(f"{i + 1}/{tests_number} {t}", end='\r')
 
             plane = Plane(m, n, corridors)
-            plane.createPassengers(t, options)
+            plane.createPassengers(t, options_)
 
             t_num = 0
             while plane.passengers:
-                t_num, boardingTimeList = plane.next_turn(options)
+                t_num, boardingTimeList = plane.next_turn(options_)
                 
             turnResults.append(t_num)
             percentile = calculatePercentile(boardingTimeList)
@@ -71,14 +81,14 @@ if __name__ == "__main__":
             percentileResults["top"].append(percentile[1])
 
         if t == "section":
-            t += " (width " + str(options["section_width"]) + ")"
+            t += " (width " + str(options_["section_width"]) + ")"
 
         print(f"\nresults for {t} passengers distribution ({tests_number} tests):")
         print(f"average total time: {sum(turnResults) / tests_number}")
         print(f"total time range: {min(turnResults)}-{max(turnResults)}")
         print(f"average boarding time bottom percentile: {sum(percentileResults['bottom']) / tests_number}")
         print(f"average boarding time top percentile: {sum(percentileResults['top']) / tests_number}")
-        print(options)
+        print(options_)
         
         # print("turn results:")
         # print(turnResults)

@@ -33,19 +33,20 @@ def main():
     else:
         _VARS['surf'] = pygame.display.set_mode(SCREENSIZE)
 
-    print(config.get("passengers", "type"))
-
     m, n = int(config.get("airplane", "seats")), int(config.get("airplane", "rows"))
     corridors = config.get("airplane", "corridors").split(",")
     for i in range(len(corridors)):
         corridors[i] = int(corridors[i])
     
-    _VARS["pt"] = config.get("passengers", "type") or "random"
+    _VARS["pt"] = config.get("passengers", "type")
+    # print(config.get("passengers", "type"))
+    
     _VARS["p_opts"] = {}
     _VARS["p_opts"]["section_width"] = int(config.get("sections", "width"))
     _VARS["p_opts"]["packing_time"] = []
     for i in config.get("passengers", "packingTime").split(", "):
         _VARS["p_opts"]["packing_time"].append(int(i))
+    _VARS["p_opts"]["naughty_chance"] = float(config.get("passengers", "naughtyChance"))
 
     _VARS["t_opts"] = {}
     _VARS["t_opts"]["barging_time"] = int(config.get("passengers", "bargingTime"))
@@ -54,8 +55,8 @@ def main():
     _VARS["plane"].createPassengers(_VARS["pt"], _VARS["p_opts"])
     
     while True:
-        checkEvents()
         _VARS['surf'].fill(GREY)
+        checkEvents()
 
         if _VARS['auto']:
             if _VARS["auto_time"] > 0:
@@ -96,6 +97,9 @@ def next_():
             if status[0] == "standing":  # drawing a standing person
                 drawRect(seat, row, (69, 179, 224))  # blue
                 for p in status[1]:
+                    if p.naughty:
+                        drawTextGrid(seat + 0.8, row, "LC")
+                    
                     if p.toWait > 0:
                         drawRect(seat, row, (171, 209, 0))  # yellow
                         drawTextGrid(seat + 0.2, row, f"{p.toWait} left")
@@ -113,7 +117,7 @@ def next_():
             elif status[0] == "boarded":  # drawing a person that's already booked
                 drawRect(seat, row, (71, 209, 71))  # green
                 drawTextGrid(seat, row, status[1].ticket())
-                drawTextGrid(seat + 0.2, row, status[1].idleTime)
+                drawTextGrid(seat + 0.2, row, status[1].boardingTime)
 
     pygame.display.update()
 

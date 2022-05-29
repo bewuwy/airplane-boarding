@@ -54,7 +54,7 @@ python gui.py
 - Blue -> moving/idle
 - Red -> packing luggage - text *n left* is number of turns left to complete packing
 - Yellow -> barging through a filled seat - text *n left* is number of turns left to complete barging through
-- Green -> passenger fully boarded - text under the passenger's ticket is the passenger's idle counter - number of turns spent idle
+- Green -> passenger fully boarded - text under the passenger's ticket is the passenger's boarding time counter - number of turns it took for the passenger to board
 
 #### Controls
 

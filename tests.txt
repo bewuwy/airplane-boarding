@@ -1,6 +1,6 @@
 [tests]
 
-n = 100
+n = 5
 types = "random", 
         "seat", 
         ["section", {"section_width": 6}], 
