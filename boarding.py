@@ -94,6 +94,7 @@ class Plane:
         packing_time = [3, 3, 3, 4]
         section_width = 6
         naughty_chance = 0.1
+        reverse = False
 
         if options is None:
             options = {}
@@ -103,6 +104,8 @@ class Plane:
             section_width = options["section_width"]
         if "naughty_chance" in options:
             naughty_chance = options["naughty_chance"]
+        if "reverse" in options:
+            reverse = bool(options["reverse"])
 
         p = []  # passengers list
         if type_ == "random":  # random passengers distribution 
@@ -193,6 +196,9 @@ class Plane:
 
             for i in naughtyList:
                 p.insert(randrange((len(p) + 2)//4), i)
+
+        if reverse:
+            p.reverse()
 
         self.passengers = p
 

@@ -83,8 +83,9 @@ if __name__ == "__main__":
             percentileResults["bottom"].append(percentile[0])
             percentileResults["top"].append(percentile[1])
 
-        if t == "section":
-            t += " (width " + str(options_["section_width"]) + ")"
+        
+        if "title" in options_:
+            t = options_["title"]
 
         print(f"\nresults for {t} passengers distribution ({tests_number} tests):")
         print(f"average total time: {sum(turnResults) / tests_number}")
