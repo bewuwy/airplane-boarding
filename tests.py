@@ -1,6 +1,7 @@
 from boarding import *
 import configparser
 import json
+import matplotlib.pyplot as plt
 
 
 def calculatePercentile(list_, bottom=0.05, top=0.95):
@@ -53,6 +54,8 @@ if __name__ == "__main__":
     print(f"plane with {n} rows and {m} seats, corridors at {corridors}")
 
     total_time_results = {}
+    top_time_results = {}
+    bot_time_results = {}
     for t in tests:
         print()
         options_ = options.copy()
@@ -66,7 +69,7 @@ if __name__ == "__main__":
         percentileResults = {"bottom": [], "top": []}
 
         for i in range(tests_number):
-            print(f"{i + 1}/{tests_number} {t}", end='\r')
+            # print(f"{i + 1}/{tests_number} {t}", end='\r')
 
             plane = Plane(m, n, corridors)
             plane.createPassengers(t, options_)
@@ -94,6 +97,8 @@ if __name__ == "__main__":
         # print(turnResults)
 
         total_time_results[t] = turnResults
+        top_time_results[t] = percentileResults["top"]
+        bot_time_results[t] = percentileResults["bottom"]
 
     # dump to csv
     with open(f"out.csv", "w") as f:
@@ -105,3 +110,35 @@ if __name__ == "__main__":
         for i in range(300-5, 600+10, 5):
             f.write(f", {i}")
         f.write("\n")
+
+    # matplotlib
+    
+    for i in total_time_results:
+        plt.hist(total_time_results[i], label=i,  alpha=0.4)
+
+    plt.legend(loc='best')
+    plt.xlabel("total turns time")
+    plt.title("Total turns time distribution")
+    
+    plt.show()
+    plt.cla()
+    
+    for i in top_time_results:
+        plt.hist(top_time_results[i], label=i,  alpha=0.4)
+
+    plt.legend(loc='best')
+    plt.xlabel("top percentile boarding time")
+    plt.title("Top percentile (95th) boarding time distribution")
+    
+    plt.show()
+    plt.cla()
+    
+    for i in bot_time_results:
+        plt.hist(bot_time_results[i], label=i,  alpha=0.4)
+
+    plt.legend(loc='best')
+    plt.xlabel("bottom percentile boarding time")
+    plt.title("Bottom percentile (5th) boarding time distribution")
+    
+    plt.show()
+    plt.cla()

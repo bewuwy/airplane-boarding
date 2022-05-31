@@ -89,7 +89,7 @@ class Plane:
         self.boardingTimeList = []
         
     def createPassengers(self, type_, options=None):  # generate random people
-        print(type_)
+        # print(type_)
         
         packing_time = [3, 3, 3, 4]
         section_width = 6
