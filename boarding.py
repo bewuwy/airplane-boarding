@@ -108,6 +108,8 @@ class Plane:
             reverse = bool(options["reverse"])
 
         p = []  # passengers list
+        naughtyList = []  # line cutters list
+        
         if type_ == "random":  # random passengers distribution 
             for seat in range(self.m):
                 if seat not in self.corridors:
@@ -118,15 +120,13 @@ class Plane:
                         place_in_line = randrange(len(p) + 1)
                         if random.random() < naughty_chance:  # if a person is naughty, then they cut half of their line
                             p_.naughty = True
-                            p.insert(place_in_line//2, p_)
+                            naughtyList.append([p_, place_in_line//2])
                         else:
                             p.insert(place_in_line, p_)
 
         elif type_ == "seat":  # seat-based passengers distribution
             seatsFilled = self.corridors.copy()
             displacement = 1
-
-            naughtyList = []
 
             while len(seatsFilled) < self.m:
                 c_ = []
@@ -138,12 +138,12 @@ class Plane:
                             p_ = Person(row, corridor - displacement, {"packing_time": random.choice(packing_time)},
                                         self.corridors)
                             
+                            place_in_line = randrange(len(c_) + 1)
                             if random.random() < naughty_chance:  # if a person is naughty, then they cut half of their line
                                 p_.naughty = True
-                                naughtyList.append(p_)
-                                # p.insert(-randrange((len(p) + 2)//2), p_)
+                                naughtyList.append([p_, place_in_line//2])
                             else:
-                                c_.insert(randrange(len(c_) + 1), p_)
+                                c_.insert(place_in_line, p_)
 
                     if corridor + displacement < self.m and corridor + displacement not in seatsFilled:
                         seatsFilled.append(corridor + displacement)
@@ -152,20 +152,16 @@ class Plane:
                             p_ = Person(row, corridor + displacement,  {"packing_time": random.choice(packing_time)}, 
                                         self.corridors,)
 
+                            place_in_line = randrange(len(c_) + 1)
                             if random.random() < naughty_chance:  # if a person is naughty, then they cut half of their line
                                 p_.naughty = True
-                                naughtyList.append(p_)
-                                # p.insert(-randrange((len(p) + 2)//2), p_)
+                                naughtyList.append([p_, place_in_line//2])
                             else:
-                                c_.insert(randrange(len(c_) + 1), p_)
+                                c_.insert(place_in_line, p_)
 
-                    # random.shuffle(c_)
                     p = c_ + p
 
                 displacement += 1
-
-            for i in naughtyList:
-                p.insert(randrange((len(p) + 2)//4), i)
 
         elif type_ == "section":  # section-based passengers distribution
             def chunks(lst, n_):
@@ -175,8 +171,6 @@ class Plane:
 
             sections = list(chunks(list(range(0, self.n)), section_width))
             sections.reverse()
-            
-            naughtyList = []
 
             for s in sections:
                 sp = []  # section passengers
@@ -185,20 +179,20 @@ class Plane:
                         if seat not in self.corridors:
                             p_ = Person(s[row], seat, {"packing_time": random.choice(packing_time)}, self.corridors)
                             
+                            place_in_line = randrange(len(sp) + 1)
                             if random.random() < naughty_chance:  # if a person is naughty, then they cut half of their line
                                 p_.naughty = True
-                                naughtyList.append(p_)
-                                # p.insert(randrange((len(p) + 2)//2), p_)
+                                naughtyList.append([p_, place_in_line//2])
                             else:
-                                sp.insert(randrange(len(sp) + 1), p_)
+                                sp.insert(place_in_line, p_)
 
                 p.extend(sp)
 
-            for i in naughtyList:
-                p.insert(randrange((len(p) + 2)//4), i)
-
         if reverse:
             p.reverse()
+            
+        for i in naughtyList:
+            p.insert(i[1], i[0])
 
         self.passengers = p
 

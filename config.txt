@@ -5,7 +5,8 @@ corridors = 3
 
 [passengers]
 # distribution types - random, seat, section
-type = random
+type = section
+reverse = 1
 
 # packing time is chosen at random from this list
 packingTime = 3, 3, 3, 5
@@ -15,7 +16,7 @@ bargingTime = 1
 naughtyChance = 0.05
 
 [sections]
-width = 6
+width = 11
 
 # application settings
 [window]

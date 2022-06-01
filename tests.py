@@ -119,6 +119,7 @@ if __name__ == "__main__":
 
     plt.legend(loc='best')
     plt.xlabel("total turns time")
+    plt.ylabel("frequency")
     plt.title("Total turns time distribution")
     
     plt.show()
@@ -129,6 +130,7 @@ if __name__ == "__main__":
 
     plt.legend(loc='best')
     plt.xlabel("top percentile boarding time")
+    plt.ylabel("frequency")
     plt.title("Top percentile (95th) boarding time distribution")
     
     plt.show()
@@ -139,6 +141,7 @@ if __name__ == "__main__":
 
     plt.legend(loc='best')
     plt.xlabel("bottom percentile boarding time")
+    plt.ylabel("frequency")
     plt.title("Bottom percentile (5th) boarding time distribution")
     
     plt.show()
