@@ -47,6 +47,7 @@ def main():
     for i in config.get("passengers", "packingTime").split(", "):
         _VARS["p_opts"]["packing_time"].append(int(i))
     _VARS["p_opts"]["naughty_chance"] = float(config.get("passengers", "naughtyChance"))
+    _VARS["p_opts"]["reverse"] = bool(config.get("passengers", "reverse"))
 
     _VARS["t_opts"] = {}
     _VARS["t_opts"]["barging_time"] = int(config.get("passengers", "bargingTime"))
@@ -81,7 +82,12 @@ def next_():
     # m, n, corridor = _VARS["dims"]
 
     drawTurnNumber(plane.turn)
-    drawText("Type: " + _VARS["pt"], WIDTH - 3 * PADDING[0], (PADDING[1] / 4))
+    
+    typeText = "Type: " + _VARS["pt"]
+    if _VARS["p_opts"]["reverse"]:
+        typeText += " (r)"
+    
+    drawText(typeText, WIDTH - 3 * PADDING[0], (PADDING[1] / 4))
 
     t = plane.next_turn(_VARS["t_opts"])
 
@@ -100,7 +106,7 @@ def next_():
                     if p.naughty:
                         drawTextGrid(seat + 0.8, row, "LC")
                     
-                    if p.toWait > 0:
+                    if p.toWait > 0 or p.barged:
                         drawRect(seat, row, (171, 209, 0))  # yellow
                         drawTextGrid(seat + 0.2, row, f"{p.toWait} left")
 
@@ -127,7 +133,7 @@ def reset():
     #                    _VARS["dims"][1], _VARS["dims"][2], _VARS["pt"], _VARS["p_opts"])))
     
     _VARS["plane"] = boarding.Plane(_VARS["plane"].m, _VARS["plane"].n, _VARS["plane"].corridors)
-    _VARS["plane"].createPassengers(_VARS["pt"])
+    _VARS["plane"].createPassengers(_VARS["pt"], _VARS["p_opts"])
     
     _VARS["end"] = False
     next_()
