@@ -21,32 +21,9 @@ naughtyChance = 0.05
 [sections]
 width = 11
 
-# GUI settings
 
+# GUI settings
 [window]
 fullscreen = True
 width = 1920
 height = 1080
-
-# Tests settings
-
-[tests]
-
-n = 500
-types = "random", "seat", ["seat", {"reverse": 1, "title": "seat reverse"}], ["section", {"section_width": 12}]
-
-        # Other examples
-
-        # ["section", {"section_width": 3, "title": "section w3"}],
-        # ["section", {"section_width": 6, "title": "section w6"}],
-        # ["section", {"section_width": 9, "title": "section w9"}],
-        # ["section", {"section_width": 12, "title": "section w12"}]
-
-        # "random", 
-        # "seat", 
-        # ["seat", {"reverse": 1, "title": "seat reverse"}],
-        # ["section", {"section_width": 11, "title": "section w11"}],
-        # ["section", {"section_width": 11, "reverse": 1, "title": "section w11 reverse"}]
-
-        # ["section", {"section_width": 3}], 
-        # ["section", {"section_width": 12}]
