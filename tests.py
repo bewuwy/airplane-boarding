@@ -28,16 +28,13 @@ if __name__ == "__main__":
     config = configparser.RawConfigParser()
     config.read(r'config.txt')
     
-    testsCfg = configparser.RawConfigParser()
-    testsCfg.read(r'tests.txt')
-    
     # tests config
     tests = []
-    for i in json.loads("[" + testsCfg.get("tests", "types") + "]"):
+    for i in json.loads("[" + config.get("tests", "types") + "]"):
         tests.append(i)
     print(tests)
 
-    tests_number = int(testsCfg.get("tests", "n"))
+    tests_number = int(config.get("tests", "n"))
     
     # plane and passengers config
     m, n = int(config.get("airplane", "seats")), int(config.get("airplane", "rows"))
