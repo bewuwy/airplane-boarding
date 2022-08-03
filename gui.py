@@ -1,9 +1,9 @@
+from Plane import Plane
+
 import sys
 import pygame
-import boarding
 from pygame.locals import KEYDOWN, K_q, K_RIGHT, K_SPACE, K_UP, K_DOWN, K_LEFT, K_RETURN, K_r, K_7, K_8, K_9
 import configparser
-
 
 # load config
 config = configparser.RawConfigParser()
@@ -52,7 +52,7 @@ def main():
     _VARS["t_opts"] = {}
     _VARS["t_opts"]["barging_time"] = int(config.get("passengers", "bargingTime"))
 
-    _VARS["plane"] = boarding.Plane(m, n, corridors)
+    _VARS["plane"] = Plane(m, n, corridors)
     _VARS["plane"].createPassengers(_VARS["pt"], _VARS["p_opts"])
     
     while True:
@@ -132,7 +132,7 @@ def reset():
     # _VARS["t"] = next_((0, plane.getGrid(_VARS["dims"][0], _VARS["dims"][1]), plane.getPassengers(_VARS["dims"][0],
     #                    _VARS["dims"][1], _VARS["dims"][2], _VARS["pt"], _VARS["p_opts"])))
     
-    _VARS["plane"] = boarding.Plane(_VARS["plane"].m, _VARS["plane"].n, _VARS["plane"].corridors)
+    _VARS["plane"] = Plane(_VARS["plane"].m, _VARS["plane"].n, _VARS["plane"].corridors)
     _VARS["plane"].createPassengers(_VARS["pt"], _VARS["p_opts"])
     
     _VARS["end"] = False
@@ -268,8 +268,4 @@ def checkEvents():
 
 
 if __name__ == '__main__':
-    # import cProfile as profile
-    #
-    # profile.run('main()')
-
     main()

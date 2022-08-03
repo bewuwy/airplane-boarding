@@ -1,4 +1,5 @@
-from boarding import *
+from Plane import Plane
+
 import configparser
 import json
 import matplotlib.pyplot as plt
