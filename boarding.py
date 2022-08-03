@@ -166,6 +166,21 @@ def createPassengers(plane, type_, options=None):  # generate random people
                                 sp.insert(place_in_line, p_)
 
                 p.extend(sp)
+        elif type=="alternating":
+            for seat in plane.grid[0:plane.n//2]:
+                for row in seat[::2]:
+                    p_ = Passenger(row, seat[row], {"packing_time": random.choice(packing_time)}, plane.corridors)
+                    p.append(p_)
+                for row in seat[1::2]:
+                    p_ = Passenger(row, seat[row], {"packing_time": random.choice(packing_time)}, plane.corridors)
+                    p.append(p_)
+            for seat in plane.grid[plane.n//2:]:
+                for row in seat[::2]:
+                    p_ = Passenger(row, seat[row], {"packing_time": random.choice(packing_time)}, plane.corridors)
+                    p.append(p_)
+                for row in seat[1::2]:
+                    p_ = Passenger(row, seat[row], {"packing_time": random.choice(packing_time)}, plane.corridors)
+                    p.append(p_)
                 
         # this is a weird idea from class
         # # custom section passengers distribution

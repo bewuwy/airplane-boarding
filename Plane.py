@@ -22,6 +22,7 @@ class Plane:
             
         self.idleList = []
         self.boardingTimeList = []
+        self.disembarkingTimeList = []
 
     def checkIfPlaceEmpty(self, row, seat):
         if len(self.grid[seat][row]) == 0 or \
