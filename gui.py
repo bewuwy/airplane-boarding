@@ -106,7 +106,7 @@ def next_():
                     if p.naughty:
                         drawTextGrid(seat + 0.8, row, "LC")
                     
-                    if p.toWait > 0:
+                    if p.toWait > 0 or p.barged:
                         drawRect(seat, row, (171, 209, 0))  # yellow
                         drawTextGrid(seat + 0.2, row, f"{p.toWait} left")
 

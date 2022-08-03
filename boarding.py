@@ -21,6 +21,7 @@ class Person:
 
         self.seatingTime = packing_time
         self.toWait = 0
+        self.barged = False
         
         self.idleTime = 0
         self.boardingTime = 0
@@ -187,6 +188,51 @@ class Plane:
                                 sp.insert(place_in_line, p_)
 
                 p.extend(sp)
+                
+        # this is a weird idea from class
+        # # custom section passengers distribution
+        # elif type_ == "custom-section":
+        #     def chunks(lst, n_):
+        #         """Yield successive n-sized chunks from lst."""
+        #         for i__ in range(0, len(lst), n_):
+        #             yield lst[i__:i__ + n_]
+
+        #     sections = list(chunks(list(range(0, self.n)), 11))
+        #     sections.reverse()
+            
+        #     print(sections)
+            
+        #     order = [
+        #         [1, 1, 2],
+        #         [1, 2, 3],
+        #         [2, 3, 3],
+        #         [],
+        #         [2, 3, 3],
+        #         [1, 2, 3],
+        #         [1, 1, 2]
+        #     ]
+            
+        #     n = 1
+        #     for seat in range(self.m):
+        #         for row in range(self.n):
+        #             if row in self.corridors:
+        #                 continue
+                    
+        #             row_s = None
+                    
+        #             ti = 0
+        #             while not row_s:
+        #                 if row in sections[ti]:
+        #                     row_s = ti
+        #                     break
+        #                 else:
+        #                     ti += 1
+                    
+        #             section_order = order[seat][row_s]
+                    
+        #             if section_order != n:
+        #                 continue
+            
 
         if reverse:
             p.reverse()
@@ -211,7 +257,8 @@ class Plane:
         if len(self.grid[seat][row]) == 1:
             if self.grid[seat][row][0].check_seated():
                 return "boarded", self.grid[seat][row][0]
-            elif row == self.grid[seat][row][0].ticketRow and seat in self.corridors:
+            elif row == self.grid[seat][row][0].ticketRow and seat in self.corridors and \
+                self.grid[seat][row][0].toWait < 1:
                 return "packing", self.grid[seat][row][0]
 
         return "standing", self.grid[seat][row]
@@ -229,6 +276,8 @@ class Plane:
             passenger.idleTime += 1
 
             return False
+        
+        passenger.barged = False
 
         # deleting the person from old place
         if passenger.currentRow > -1 and passenger.currentSeat > -1 \
@@ -279,11 +328,14 @@ class Plane:
                         p.seatingTime -= 1
                         continue
                     elif self.checkIfPlaceEmpty(p.currentRow, toMoveY):  # if seat left/right of current seat empty
-                        self.movePerson(p, p.currentRow, toMoveY)
-
-                        if len(self.grid[toMoveY][p.currentRow]) > 1:
+                        
+                        if (len(self.grid[toMoveY][p.currentRow]) > 0 or \
+                           len(self.grid[p.currentSeat][p.currentRow]) > 1) and not p.barged:
                             p.toWait = barging_time
-
+                            p.barged = True
+                        
+                        self.movePerson(p, p.currentRow, toMoveY)
+                        
                         continue
                     else:  # if seat left/right of current seat taken
                         p.idleTime += 1
