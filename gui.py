@@ -4,6 +4,8 @@ import sys
 import pygame
 from pygame.locals import KEYDOWN, K_q, K_RIGHT, K_SPACE, K_UP, K_DOWN, K_LEFT, K_RETURN, K_r, K_7, K_8, K_9
 import configparser
+from boarding import createPassengers
+from boarding import next_boarding_turn
 
 # load config
 config = configparser.RawConfigParser()
@@ -53,7 +55,7 @@ def main():
     _VARS["t_opts"]["barging_time"] = int(config.get("passengers", "bargingTime"))
 
     _VARS["plane"] = Plane(m, n, corridors)
-    _VARS["plane"].createPassengers(_VARS["pt"], _VARS["p_opts"])
+    createPassengers(_VARS["plane"],_VARS["pt"], _VARS["p_opts"])
     
     while True:
         _VARS['surf'].fill(GREY)
@@ -89,7 +91,7 @@ def next_():
     
     drawText(typeText, WIDTH - 3 * PADDING[0], (PADDING[1] / 4))
 
-    t = plane.next_turn(_VARS["t_opts"])
+    t = next_boarding_turn(plane, _VARS["t_opts"])
 
     drawGrid(n, m)
     for c in corridors:
