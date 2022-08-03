@@ -1,12 +1,7 @@
 [tests]
 
 n = 500
-types = "custom-section"
-
-
-        # "random", "seat", ["seat", {"reverse": 1, "title": "seat reverse"}], ["section", {"section_width": 12}]
-
-
+types = "random", "seat", ["seat", {"reverse": 1, "title": "seat reverse"}], ["section", {"section_width": 12}]
 
         # ["section", {"section_width": 3, "title": "section w3"}],
         # ["section", {"section_width": 6, "title": "section w6"}],

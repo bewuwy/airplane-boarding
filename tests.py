@@ -66,7 +66,6 @@ if __name__ == "__main__":
             t = t[0]
         
         turnResults = []
-        percentileResults = {"bottom": [], "top": []}
 
         for i in range(tests_number):
             # print(f"{i + 1}/{tests_number} {t}", end='\r')
@@ -80,9 +79,6 @@ if __name__ == "__main__":
                 
             turnResults.append(t_num)
             percentile = calculatePercentile(boardingTimeList)
-            percentileResults["bottom"].append(percentile[0])
-            percentileResults["top"].append(percentile[1])
-
         
         if "title" in options_:
             t = options_["title"]
@@ -90,16 +86,12 @@ if __name__ == "__main__":
         print(f"\nresults for {t} passengers distribution ({tests_number} tests):")
         print(f"average total time: {sum(turnResults) / tests_number}")
         print(f"total time range: {min(turnResults)}-{max(turnResults)}")
-        print(f"average boarding time bottom percentile: {sum(percentileResults['bottom']) / tests_number}")
-        print(f"average boarding time top percentile: {sum(percentileResults['top']) / tests_number}")
         print(options_)
         
         # print("turn results:")
         # print(turnResults)
 
         total_time_results[t] = turnResults
-        top_time_results[t] = percentileResults["top"]
-        bot_time_results[t] = percentileResults["bottom"]
 
     # dump to csv
     with open(f"out.csv", "w") as f:
@@ -121,28 +113,6 @@ if __name__ == "__main__":
     plt.xlabel("total turns time")
     plt.ylabel("frequency")
     plt.title("Total turns time distribution")
-    
-    plt.show()
-    plt.cla()
-    
-    for i in top_time_results:
-        plt.hist(top_time_results[i], label=i,  alpha=0.4)
-
-    plt.legend(loc='best')
-    plt.xlabel("top percentile boarding time")
-    plt.ylabel("frequency")
-    plt.title("Top percentile (95th) boarding time distribution")
-    
-    plt.show()
-    plt.cla()
-    
-    for i in bot_time_results:
-        plt.hist(bot_time_results[i], label=i,  alpha=0.4)
-
-    plt.legend(loc='best')
-    plt.xlabel("bottom percentile boarding time")
-    plt.ylabel("frequency")
-    plt.title("Bottom percentile (5th) boarding time distribution")
     
     plt.show()
     plt.cla()
