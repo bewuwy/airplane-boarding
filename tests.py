@@ -38,9 +38,8 @@ if __name__ == "__main__":
     
     # plane and passengers config
     m, n = int(config.get("airplane", "seats")), int(config.get("airplane", "rows"))
-    corridors = config.get("airplane", "corridors").split(",")
-    for i in range(len(corridors)):
-        corridors[i] = int(corridors[i])
+    columnsLengths = [int(i) for i in config.get("airplane", "columnsLengths").split(',')]
+    corridors = [int(i) for i in config.get("airplane", "corridors").split(",")]
 
     options = {}
     options["packing_time"] = []
@@ -70,7 +69,7 @@ if __name__ == "__main__":
         for i in range(tests_number):
             # print(f"{i + 1}/{tests_number} {t}", end='\r')
 
-            plane = Plane(m, n, corridors)
+            plane = Plane(m, n, corridors, columnsLengths)
             createPassengers(plane, t, options_)
 
             t_num = 0
