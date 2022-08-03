@@ -4,20 +4,23 @@ import random
 
 
 class Plane:
-    def __init__(self, m, n, corridors):
+    def __init__(self, m, n, corridors, columns_lengths=None):
         self.grid = []
         self.corridors = corridors
         self.passengers = []
 
         self.m = m
         self.n = n
+        if not columns_lengths:
+            columns_lengths = [n for i in range(m)]
 
         self.turn = 0
 
-        for seat in range(m):
+        for column in range(m):
             t_ = []
-            for row in range(n):
+            for row in range(columns_lengths[column]):
                 t_.append([])
+                
             self.grid.append(t_)
             
         self.idleList = []
@@ -72,5 +75,3 @@ class Plane:
         self.grid[seat][row].append(passenger)
 
         return True
-
-    

@@ -3,12 +3,13 @@
 [airplane]
 rows = 33
 seats = 7
+columnsLengths = 28, 30, 33, 33, 33, 30, 28
 corridors = 3
 
 [passengers]
 # distribution types - random, seat, section
-type = section
-reverse = 1
+type = seat
+reverse = 0
 
 # packing time is chosen at random from this list
 packingTime = 0, 1, 3, 5

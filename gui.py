@@ -1,30 +1,17 @@
 from Plane import Plane
+from boarding import createPassengers, next_boarding_turn
 
 import sys
 import pygame
 from pygame.locals import KEYDOWN, K_q, K_RIGHT, K_SPACE, K_UP, K_DOWN, K_LEFT, K_RETURN, K_r, K_7, K_8, K_9
 import configparser
-from boarding import createPassengers
-from boarding import next_boarding_turn
 
-# load config
-config = configparser.RawConfigParser()
-configFilePath = r'config.txt'
-config.read(configFilePath)
 
 # CONSTANTS:
-SCREENSIZE = WIDTH, HEIGHT = int(config.get("window", "width")), int(config.get("window", "height"))
 BLACK = (0, 0, 0)
 GREY = (160, 160, 160)
 PADDING = PADTOPBOTTOM, PADLEFTRIGHT = 60, 60
-
-# VARS:
-_VARS = {'surf': False, "auto": False, "auto_time": 1000, "end": False}
-turns = {}
-
-pygame.font.init()
-font = pygame.font.SysFont('Sans Serif', 26)
-
+    
 
 def main():
     pygame.init()
@@ -36,9 +23,8 @@ def main():
         _VARS['surf'] = pygame.display.set_mode(SCREENSIZE)
 
     m, n = int(config.get("airplane", "seats")), int(config.get("airplane", "rows"))
-    corridors = config.get("airplane", "corridors").split(",")
-    for i in range(len(corridors)):
-        corridors[i] = int(corridors[i])
+    columns_lengths = [int(i) for i in config.get("airplane", "columnsLengths").split(",")]
+    corridors = [int(i) for i in config.get("airplane", "corridors").split(",")]
     
     _VARS["pt"] = config.get("passengers", "type")
     # print(config.get("passengers", "type"))
@@ -49,12 +35,12 @@ def main():
     for i in config.get("passengers", "packingTime").split(", "):
         _VARS["p_opts"]["packing_time"].append(int(i))
     _VARS["p_opts"]["naughty_chance"] = float(config.get("passengers", "naughtyChance"))
-    _VARS["p_opts"]["reverse"] = bool(config.get("passengers", "reverse"))
+    _VARS["p_opts"]["reverse"] = bool(int(config.get("passengers", "reverse")))
 
     _VARS["t_opts"] = {}
     _VARS["t_opts"]["barging_time"] = int(config.get("passengers", "bargingTime"))
 
-    _VARS["plane"] = Plane(m, n, corridors)
+    _VARS["plane"] = Plane(m, n, corridors, columns_lengths)
     createPassengers(_VARS["plane"],_VARS["pt"], _VARS["p_opts"])
     
     while True:
@@ -81,7 +67,6 @@ def next_():
         return
     
     m, n, corridors = plane.m, plane.n, plane.corridors
-    # m, n, corridor = _VARS["dims"]
 
     drawTurnNumber(plane.turn)
     
@@ -93,7 +78,7 @@ def next_():
 
     t = next_boarding_turn(plane, _VARS["t_opts"])
 
-    drawGrid(n, m)
+    drawGrid(plane.grid)
     for c in corridors:
         for i in range(n):  # draw corridor in black
             drawRect(c, i)
@@ -170,7 +155,10 @@ def drawRect(m, n, color=BLACK):
     )
 
 
-def drawGrid(m, n):
+def drawGrid(grid):
+    m = len(grid)
+    n = max(len(row) for row in grid)
+    
     # DRAW Rectangle
     # TOP lEFT TO RIGHT
     pygame.draw.line(
@@ -194,8 +182,8 @@ def drawGrid(m, n):
         (WIDTH - PADLEFTRIGHT, HEIGHT - PADTOPBOTTOM), 2)
 
     # Get cell size
-    horizontal_cellsize = (WIDTH - (PADLEFTRIGHT * 2)) / m
-    vertical_cellsize = (HEIGHT - (PADTOPBOTTOM * 2)) / n
+    horizontal_cellsize = (WIDTH - (PADLEFTRIGHT * 2)) / n
+    vertical_cellsize = (HEIGHT - (PADTOPBOTTOM * 2)) / m
 
     # VERTICAL DIVISIONS: (0,1,2) for grid(3) for example
     for x in range(max(m, n)):
@@ -208,6 +196,12 @@ def drawGrid(m, n):
             _VARS['surf'], BLACK,
             (0 + PADLEFTRIGHT, 0 + PADTOPBOTTOM + (vertical_cellsize * x)),
             (WIDTH - PADLEFTRIGHT, 0 + PADTOPBOTTOM + (vertical_cellsize * x)), 2)
+
+    # fill blank spaces
+    for column in range(m):
+        if len(grid[column]) < n:
+            for row in range(n - len(grid[column])):
+                drawRect(column, n - (row+1), (255, 255, 255))
 
     # add labels
     for i in range(m):
@@ -270,4 +264,18 @@ def checkEvents():
 
 
 if __name__ == '__main__':
+    # load config
+    config = configparser.RawConfigParser()
+    configFilePath = r'config.txt'
+    config.read(configFilePath)
+    
+    SCREENSIZE = WIDTH, HEIGHT = int(config.get("window", "width")), int(config.get("window", "height"))
+
+    # VARS:
+    _VARS = {'surf': False, "auto": False, "auto_time": 1000, "end": False}
+    turns = {}
+
+    pygame.font.init()
+    font = pygame.font.SysFont('Sans Serif', 26)
+    
     main()
