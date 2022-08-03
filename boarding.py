@@ -1,6 +1,7 @@
 from Passenger import Passenger
 import random
 
+
 def next_boarding_turn(plane, options=None):
         barging_time = 1
         if options is None:
@@ -67,9 +68,9 @@ def next_boarding_turn(plane, options=None):
 
         return plane.turn, plane.boardingTimeList  # t_num, grid_, people_
 
-def createPassengers(plane, type_, options=None):  # generate random people
-        # print(type_)
-        
+
+def createPassengers(plane, type_, options=None):
+        # default options
         packing_time = [3, 3, 3, 4]
         section_width = 6
         naughty_chance = 0.1
@@ -92,7 +93,7 @@ def createPassengers(plane, type_, options=None):  # generate random people
         if type_ == "random":  # random passengers distribution 
             for seat in range(plane.m):
                 if seat not in plane.corridors:
-                    for row in range(plane.n):
+                    for row in range(len(plane.grid[seat])):
                         p_ = Passenger(row, seat, {"packing_time": random.choice(packing_time)}, 
                                     plane.corridors)
 
@@ -113,7 +114,7 @@ def createPassengers(plane, type_, options=None):  # generate random people
                     if corridor - displacement >= 0 and corridor - displacement not in seatsFilled:
                         seatsFilled.append(corridor - displacement)
 
-                        for row in range(plane.n):
+                        for row in range(len(plane.grid[corridor - displacement])):
                             p_ = Passenger(row, corridor - displacement, {"packing_time": random.choice(packing_time)},
                                         plane.corridors)
                             
@@ -127,7 +128,7 @@ def createPassengers(plane, type_, options=None):  # generate random people
                     if corridor + displacement < plane.m and corridor + displacement not in seatsFilled:
                         seatsFilled.append(corridor + displacement)
 
-                        for row in range(plane.n):
+                        for row in range(len(plane.grid[corridor + displacement])):
                             p_ = Passenger(row, corridor + displacement,  {"packing_time": random.choice(packing_time)}, 
                                         plane.corridors,)
 
@@ -144,7 +145,6 @@ def createPassengers(plane, type_, options=None):  # generate random people
 
         elif type_ == "section":  # section-based passengers distribution
             def chunks(lst, n_):
-                """Yield successive n-sized chunks from lst."""
                 for i__ in range(0, len(lst), n_):
                     yield lst[i__:i__ + n_]
 
@@ -156,6 +156,10 @@ def createPassengers(plane, type_, options=None):  # generate random people
                 for row in range(len(s)):
                     for seat in range(plane.m):
                         if seat not in plane.corridors:
+                            if s[row] >= len(plane.grid[seat]):
+                                # if the place is out of bounds, then it's not a valid place
+                                continue
+                            
                             p_ = Passenger(s[row], seat, {"packing_time": random.choice(packing_time)}, plane.corridors)
                             
                             place_in_line = random.randrange(len(sp) + 1)
@@ -166,6 +170,7 @@ def createPassengers(plane, type_, options=None):  # generate random people
                                 sp.insert(place_in_line, p_)
 
                 p.extend(sp)
+                
         elif type=="alternating":
             corridors = plane.corridors.copy()
             corridors.insert(0, -1);
