@@ -1,4 +1,6 @@
 from Plane import Plane
+from boarding import next_boarding_turn
+from boarding import createPassengers
 
 import configparser
 import json
@@ -72,11 +74,11 @@ if __name__ == "__main__":
             # print(f"{i + 1}/{tests_number} {t}", end='\r')
 
             plane = Plane(m, n, corridors)
-            plane.createPassengers(t, options_)
+            createPassengers(plane, t, options_)
 
             t_num = 0
             while plane.passengers:
-                t_num, boardingTimeList = plane.next_turn(options_)
+                t_num, boardingTimeList = next_boarding_turn(plane, options_)
                 
             turnResults.append(t_num)
             percentile = calculatePercentile(boardingTimeList)
