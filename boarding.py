@@ -143,10 +143,8 @@ def createPassengers(plane, type_, options=None):
 
                 displacement += 1
 
-        # NOT WORKING WITH COLUMNSLENGTHS
         elif type_ == "section":  # section-based passengers distribution
             def chunks(lst, n_):
-                """Yield successive n-sized chunks from lst."""
                 for i__ in range(0, len(lst), n_):
                     yield lst[i__:i__ + n_]
 
@@ -158,6 +156,10 @@ def createPassengers(plane, type_, options=None):
                 for row in range(len(s)):
                     for seat in range(plane.m):
                         if seat not in plane.corridors:
+                            if s[row] >= len(plane.grid[seat]):
+                                # if the place is out of bounds, then it's not a valid place
+                                continue
+                            
                             p_ = Passenger(s[row], seat, {"packing_time": random.choice(packing_time)}, plane.corridors)
                             
                             place_in_line = random.randrange(len(sp) + 1)
@@ -168,6 +170,7 @@ def createPassengers(plane, type_, options=None):
                                 sp.insert(place_in_line, p_)
 
                 p.extend(sp)
+                
         elif type=="alternating":
             sc = []
             for seat in plane.grid[0:plane.n//2]:
