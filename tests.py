@@ -39,7 +39,10 @@ if __name__ == "__main__":
     
     # plane and passengers config
     m, n = int(config.get("airplane", "seats")), int(config.get("airplane", "rows"))
-    columnsLengths = [int(i) for i in config.get("airplane", "columnsLengths").split(',')]
+    if config.get("airplane", "columnsLengths"):
+        columnsLengths = [int(i) for i in config.get("airplane", "columnsLengths").split(',')]
+    else:
+        columnsLengths = None
     corridors = [int(i) for i in config.get("airplane", "corridors").split(",")]
 
     options = {}

@@ -21,9 +21,18 @@ def main():
         _VARS['surf'] = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
     else:
         _VARS['surf'] = pygame.display.set_mode(SCREENSIZE)
+        
+    _VARS['l_opts'] = {}
+    _VARS["l_opts"]["showBoardingTime"] = config.get("labels", "showBoardingTime").lower() == "true"
+    _VARS["l_opts"]["showLC"] = config.get("labels", "showLC").lower() == "true"
+    
+    print(_VARS["l_opts"])
 
     m, n = int(config.get("airplane", "seats")), int(config.get("airplane", "rows"))
-    columns_lengths = [int(i) for i in config.get("airplane", "columnsLengths").split(",")]
+    if config.get("airplane", "columnsLengths"):
+        columns_lengths = [int(i) for i in config.get("airplane", "columnsLengths").split(",")]
+    else:
+        columns_lengths = None
     corridors = [int(i) for i in config.get("airplane", "corridors").split(",")]
     
     _VARS["pt"] = config.get("passengers", "type")
@@ -35,7 +44,7 @@ def main():
     for i in config.get("passengers", "packingTime").split(", "):
         _VARS["p_opts"]["packing_time"].append(int(i))
     _VARS["p_opts"]["naughty_chance"] = float(config.get("passengers", "naughtyChance"))
-    _VARS["p_opts"]["reverse"] = bool(int(config.get("passengers", "reverse")))
+    _VARS["p_opts"]["reverse"] = config.get("passengers", "reverse").lower() == "true"
 
     _VARS["t_opts"] = {}
     _VARS["t_opts"]["barging_time"] = int(config.get("passengers", "bargingTime"))
@@ -90,7 +99,7 @@ def next_():
             if status[0] == "standing":  # drawing a standing person
                 drawRect(seat, row, (69, 179, 224))  # blue
                 for p in status[1]:
-                    if p.naughty:
+                    if p.naughty and _VARS['l_opts']['showLC']:
                         drawTextGrid(seat + 0.8, row, "LC")
                     
                     if p.toWait > 0 or p.barged:
@@ -110,7 +119,9 @@ def next_():
             elif status[0] == "boarded":  # drawing a person that's already booked
                 drawRect(seat, row, (71, 209, 71))  # green
                 drawTextGrid(seat, row, status[1].ticket())
-                drawTextGrid(seat + 0.2, row, status[1].boardingTime)
+                
+                if _VARS["l_opts"]['showBoardingTime']:
+                    drawTextGrid(seat + 0.2, row, status[1].boardingTime)
 
     pygame.display.update()
 
@@ -120,10 +131,10 @@ def reset():
     #                    _VARS["dims"][1], _VARS["dims"][2], _VARS["pt"], _VARS["p_opts"])))
     
     _VARS["plane"] = Plane(_VARS["plane"].m, _VARS["plane"].n, _VARS["plane"].corridors)
-    _VARS["plane"].createPassengers(_VARS["pt"], _VARS["p_opts"])
+    createPassengers(_VARS["plane"], _VARS["pt"], _VARS["p_opts"])
     
     _VARS["end"] = False
-    next_()
+    next_() # TODO: draw the first turn
     
 
 def drawTurnNumber(turn):
