@@ -196,41 +196,47 @@ def createPassengers(plane, type_, options=None):
 
         elif type_=="alternating-wma":
             corridors = plane.corridors.copy()
-            corridors.insert(0, -1)
-            for corridor_index in range(len(corridors)-1):
+            corridors.insert(0, -corridors[0]-2)
+            corridors.append(2*plane.m - corridors[-1]-1)
+            for corridor_index in range(1,len(corridors)-1):
                 sc = []
+                j = []
                 #for seat in plane.grid[corridors[corridor_index]+1:corridors[corridor_index+1]-1]:
                 print(corridors[corridor_index], corridors[corridor_index+1])
-                for i in range(corridors[corridor_index]+1,corridors[corridor_index+1]):
+                for i in range(int((corridors[corridor_index-1]+corridors[corridor_index])/2)+1,corridors[corridor_index]):
                     print(i)
                     seat = plane.grid[i]
                     for row in range (len(seat))[::2]:
                         p_ = Passenger(row, i, {"packing_time": random.choice(packing_time)}, plane.corridors)
                         sc.append(p_)
                     random.shuffle(sc)
-                    p.extend(sc)
+                    j.append(sc)
                     sc = []
                     for row in range(len(seat))[1::2]:
                         p_ = Passenger(row, i, {"packing_time": random.choice(packing_time)}, plane.corridors)
                         sc.append(p_)
                     random.shuffle(sc)
-                    p.extend(sc)
+                    j.append(sc)
                     sc = []
-            for i in range(plane.m-1,corridors[-1],-1):
-                print(i)
-                seat = plane.grid[i]
-                for row in range (len(seat))[::2]:
-                    p_ = Passenger(row, i, {"packing_time": random.choice(packing_time)}, plane.corridors)
-                    sc.append(p_)
-                random.shuffle(sc)
-                p.extend(sc)
-                sc = []
-                for row in range(len(seat))[1::2]:
-                    p_ = Passenger(row, i, {"packing_time": random.choice(packing_time)}, plane.corridors)
-                    sc.append(p_)
-                random.shuffle(sc)
-                p.extend(sc)
-                sc = []
+                for i in range(int((corridors[corridor_index+1]+corridors[corridor_index])/2),corridors[corridor_index],-1):
+                    print(i)
+                    seat = plane.grid[i]
+                    for row in range (len(seat))[::2]:
+                        p_ = Passenger(row, i, {"packing_time": random.choice(packing_time)}, plane.corridors)
+                        sc.append(p_)
+                    random.shuffle(sc)
+                    j.append(sc)
+                    sc = []
+                    for row in range(len(seat))[1::2]:
+                        p_ = Passenger(row, i, {"packing_time": random.choice(packing_time)}, plane.corridors)
+                        sc.append(p_)
+                    random.shuffle(sc)
+                    j.append(sc)
+                    sc = []
+                for g in range(int(len(j)/2)):
+                    j[g].extend(j[int(len(j)/2)+g])
+                    random.shuffle(j[g])
+                    p.extend(j[g])
                 
         # this is a weird idea from class
         # # custom section passengers distribution
