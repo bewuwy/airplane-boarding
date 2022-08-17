@@ -8,7 +8,7 @@ corridors = 3
 
 [passengers]
 # distribution types - random, seat, section
-type = section
+type = alternating-wma
 reverse = 0
 
 # packing time is chosen at random from this list

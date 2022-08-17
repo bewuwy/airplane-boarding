@@ -105,7 +105,6 @@ if __name__ == "__main__":
         f.write("\n")
 
     # matplotlib
-    
     for i in total_time_results:
         plt.hist(total_time_results[i], label=i,  alpha=0.4)
 
