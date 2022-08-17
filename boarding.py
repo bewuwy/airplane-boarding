@@ -170,7 +170,7 @@ def createPassengers(plane, type_, options=None):
 
                 p.extend(sp)
                 
-        elif type_=="alternating":
+        elif type_ == "alternating":
             corridors = plane.corridors.copy()
             corridors.insert(0, -1)
             corridors.append(plane.m)
@@ -194,6 +194,7 @@ def createPassengers(plane, type_, options=None):
                 random.shuffle(sc)
                 p.extend(sc)
 
+        elif type_ == "alternating-wma":
             corridors = plane.corridors.copy()
             corridors.insert(0, -corridors[0]-2)
             corridors.append(2*plane.m - corridors[-1]-1)
@@ -205,6 +206,7 @@ def createPassengers(plane, type_, options=None):
                 for i in range(int((corridors[corridor_index-1]+corridors[corridor_index])/2)+1,corridors[corridor_index]):
                     print(i)
                     seat = plane.grid[i]
+                    for row in range(len(seat))[::2]:
                         p_ = Passenger(row, i, {"packing_time": random.choice(packing_time)}, plane.corridors)
                         sc.append(p_)
                     random.shuffle(sc)
