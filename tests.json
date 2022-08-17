@@ -3,8 +3,8 @@
     "tests": [
         "random", 
         "seat", 
-        ["seat", {"reverse": 1, "title": "seat reverse"}], 
-        ["section", {"section_width": 12}]
+        "alternating",
+        "alternating-wma"
     ],
 
     "example_tests": [
