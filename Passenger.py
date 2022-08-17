@@ -32,13 +32,11 @@ class Passenger:
         elif self.ticketSeat < corridors[0]:
             self.entranceCorridors.append(corridors[0])
         else:
+            min = 1000000000
             for e in range(len(corridors)):
-                self.entranceCorridors.append(corridors[e])
-                if len(self.entranceCorridors) > 2:
-                    self.entranceCorridors.pop(0)
-
-                if corridors[e] > self.ticketSeat:
-                    break
+                if abs(corridors[e] - self.ticketSeat) < min:
+                    min = abs(corridors[e] - self.ticketSeat)
+                    self.entranceCorridors=[corridors[e]]
 
         if id_ is None:
             id_ = str(self.ticketRow) + str(self.ticketSeat)

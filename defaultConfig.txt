@@ -1,3 +1,4 @@
+<<<<<<< HEAD:defaultConfig.txt
 # Airplane settings
 
 [airplane]
@@ -34,5 +35,5 @@ width = 1920
 height = 1080
 
 [labels]
-showBoardingTime = False
-showLC = False
+showBoardingTime = True
+showLC = True
