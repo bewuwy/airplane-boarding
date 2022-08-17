@@ -14,13 +14,12 @@ def next_boarding_turn(plane, options=None):
         for p in plane.passengers:  # trying to move every passenger
             p.boardingTime += 1
             if p.currentRow < 0:  # person not on plane yet
-                for corridor in p.entranceCorridors:
-                    if plane.checkIfPlaceEmpty(0, corridor):  # entrance empty
-                        plane.movePerson(p, 0, corridor)
-                        continue
-                    else:  # entrance taken
-                        p.idleTime += 1
-                        continue
+                if plane.checkIfPlaceEmpty(0, p.entranceCorridor):  # entrance empty
+                    plane.movePerson(p, 0, p.entranceCorridor)
+                    continue
+                else:  # entrance taken
+                    p.idleTime += 1
+                    continue
 
             if p.currentRow >= 0:  # person already on plane
                 if p.currentRow == p.ticketRow:  # person in a correct row

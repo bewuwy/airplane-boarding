@@ -1,4 +1,3 @@
-<<<<<<< HEAD:defaultConfig.txt
 # Airplane settings
 
 [airplane]

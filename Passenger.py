@@ -26,17 +26,16 @@ class Passenger:
         self.boardingTime = 0
         self.naughty = False
 
-        self.entranceCorridors = []
         if self.ticketSeat > corridors[-1]:
-            self.entranceCorridors.append(corridors[-1])
+            self.entranceCorridor = corridors[-1]
         elif self.ticketSeat < corridors[0]:
-            self.entranceCorridors.append(corridors[0])
+            self.entranceCorridor = corridors[0]
         else:
-            min = 1000000000
+            min_ = float("inf")
             for e in range(len(corridors)):
-                if abs(corridors[e] - self.ticketSeat) < min:
-                    min = abs(corridors[e] - self.ticketSeat)
-                    self.entranceCorridors=[corridors[e]]
+                if abs(corridors[e] - self.ticketSeat) < min_:
+                    min_ = abs(corridors[e] - self.ticketSeat)
+                    self.entranceCorridor = corridors[e]
 
         if id_ is None:
             id_ = str(self.ticketRow) + str(self.ticketSeat)
