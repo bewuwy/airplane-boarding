@@ -54,14 +54,9 @@ def main():
     while True:
         _VARS['surf'].fill(GREY)
         checkEvents()
-
-        if _VARS['auto']:
-            if _VARS["auto_time"] > 0:
-                t = str(round(1 / (_VARS["auto_time"] / 1000), 1)) + " turns/s"
-            else:
-                t = "FAST"
-
-            drawText(t, WIDTH - 2.5 * PADDING[0], HEIGHT - (PADDING[1] / 2))
+        
+        # TODO: update screen every frame not every next_turn
+        #! update screen every frame not every next_turn
 
         # pygame.display.update()
 
@@ -78,18 +73,28 @@ def next_():
 
     drawTurnNumber(plane.turn)
     
+    if _VARS['auto']:
+        if _VARS["auto_time"] > 0:
+            t = str(round(1 / (_VARS["auto_time"] / 1000), 1)) + " turns/s"
+        else:
+            t = "FAST"
+
+        drawText(t, WIDTH - 2.5 * PADDING[0], HEIGHT - (PADDING[1] / 2))
+    
     typeText = "Type: " + _VARS["pt"]
     if _VARS["p_opts"]["reverse"]:
         typeText += " (r)"
     
-    drawText(typeText, WIDTH - 3 * PADDING[0], (PADDING[1] / 4))
+    drawText(typeText, WIDTH - PADDING[0] - font.size(typeText)[0], (PADDING[1] / 4))
 
-    t = next_boarding_turn(plane, _VARS["t_opts"])
+    next_boarding_turn(plane, _VARS["t_opts"])
 
     drawGrid(plane.grid)
     for c in corridors:
         for i in range(n):  # draw corridor in black
-            drawRect(c, i)
+            # if place empty
+            if plane.grid[c][i] == []:
+                drawRect(c, i)
 
     for seat in range(len(plane.grid)):
         for row in range(len(plane.grid[seat])):
@@ -126,9 +131,6 @@ def next_():
 
 
 def reset():
-    # _VARS["t"] = next_((0, plane.getGrid(_VARS["dims"][0], _VARS["dims"][1]), plane.getPassengers(_VARS["dims"][0],
-    #                    _VARS["dims"][1], _VARS["dims"][2], _VARS["pt"], _VARS["p_opts"])))
-    
     _VARS["plane"] = Plane(_VARS["plane"].m, _VARS["plane"].n, _VARS["plane"].corridors, _VARS['p_opts']['columns_lengths'])
     createPassengers(_VARS["plane"], _VARS["pt"], _VARS["p_opts"])
     
@@ -214,9 +216,9 @@ def drawGrid(grid):
                 drawRect(column, n - (row+1), GREY)
 
     # add labels
-    for i in range(m):
+    for i in range(n):
         drawText(i + 1, PADDING[0] + i * horizontal_cellsize, PADDING[1] - 20)
-    for j in range(n):
+    for j in range(m):
         drawText(chr(65 + j), PADDING[0] - 20, PADDING[1] + j * vertical_cellsize)
 
 
