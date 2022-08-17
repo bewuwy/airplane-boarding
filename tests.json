@@ -1,8 +1,7 @@
 {
-    "number": 50,
+    "number": 300,
     "tests": [
-        "random", 
-        "seat", 
+        "seat",
         "alternating",
         "alternating-wma"
     ],

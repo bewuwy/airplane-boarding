@@ -202,9 +202,7 @@ def createPassengers(plane, type_, options=None):
                 sc = []
                 j = []
                 #for seat in plane.grid[corridors[corridor_index]+1:corridors[corridor_index+1]-1]:
-                print(corridors[corridor_index], corridors[corridor_index+1])
                 for i in range(int((corridors[corridor_index-1]+corridors[corridor_index])/2)+1,corridors[corridor_index]):
-                    print(i)
                     seat = plane.grid[i]
                     for row in range(len(seat))[::2]:
                         p_ = Passenger(row, i, {"packing_time": random.choice(packing_time)}, plane.corridors)
@@ -219,7 +217,6 @@ def createPassengers(plane, type_, options=None):
                     j.append(sc)
                     sc = []
                 for i in range(int((corridors[corridor_index+1]+corridors[corridor_index])/2),corridors[corridor_index],-1):
-                    print(i)
                     seat = plane.grid[i]
                     for row in range (len(seat))[::2]:
                         p_ = Passenger(row, i, {"packing_time": random.choice(packing_time)}, plane.corridors)
@@ -237,7 +234,7 @@ def createPassengers(plane, type_, options=None):
                     j[g].extend(j[int(len(j)/2)+g])
                     random.shuffle(j[g])
                     p.extend(j[g])
-                
+
         # this is a weird idea from class
         # # custom section passengers distribution
         # elif type_ == "custom-section":

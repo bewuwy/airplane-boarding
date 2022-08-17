@@ -71,7 +71,7 @@ if __name__ == "__main__":
         turnResults = []
 
         for i in range(tests_number):
-            # print(f"{i + 1}/{tests_number} {t}", end='\r')
+            print(f"{i + 1}/{tests_number} {t}", end='\r')
 
             plane = Plane(m, n, corridors, columnsLengths)
             createPassengers(plane, t, options_)
@@ -86,8 +86,8 @@ if __name__ == "__main__":
         if "title" in options_:
             t = options_["title"]
 
-        print(f"\nresults for {t} passengers distribution ({tests_number} tests):")
-        print(f"average total time: {sum(turnResults) / tests_number}")
+        print(f"\n\nresults for {t} passengers distribution ({tests_number} tests):")
+        print(f"average total time: {round(sum(turnResults) / tests_number, 2)}")
         print(f"total time range: {min(turnResults)}-{max(turnResults)}")
         print(options_)
         
@@ -106,6 +106,8 @@ if __name__ == "__main__":
         for i in range(300-5, 600+10, 5):
             f.write(f", {i}")
         f.write("\n")
+
+    input("\npress enter to show histogram")
 
     # matplotlib
     for i in total_time_results:
