@@ -26,19 +26,18 @@ def main():
     _VARS["l_opts"]["showBoardingTime"] = config.get("labels", "showBoardingTime").lower() == "true"
     _VARS["l_opts"]["showLC"] = config.get("labels", "showLC").lower() == "true"
     
-    print(_VARS["l_opts"])
+    _VARS["p_opts"] = {}
 
     m, n = int(config.get("airplane", "seats")), int(config.get("airplane", "rows"))
     if config.get("airplane", "columnsLengths"):
-        columns_lengths = [int(i) for i in config.get("airplane", "columnsLengths").split(",")]
+        _VARS['p_opts']['columns_lengths'] = [int(i) for i in config.get("airplane", "columnsLengths").split(",")]
     else:
-        columns_lengths = None
+        _VARS['p_opts']['columns_lengths'] = None
     corridors = [int(i) for i in config.get("airplane", "corridors").split(",")]
     
     _VARS["pt"] = config.get("passengers", "type")
     # print(config.get("passengers", "type"))
     
-    _VARS["p_opts"] = {}
     _VARS["p_opts"]["section_width"] = int(config.get("sections", "width"))
     _VARS["p_opts"]["packing_time"] = []
     for i in config.get("passengers", "packingTime").split(", "):
@@ -49,7 +48,7 @@ def main():
     _VARS["t_opts"] = {}
     _VARS["t_opts"]["barging_time"] = int(config.get("passengers", "bargingTime"))
 
-    _VARS["plane"] = Plane(m, n, corridors, columns_lengths)
+    _VARS["plane"] = Plane(m, n, corridors, _VARS['p_opts']['columns_lengths'])
     createPassengers(_VARS["plane"],_VARS["pt"], _VARS["p_opts"])
     
     while True:
@@ -130,7 +129,7 @@ def reset():
     # _VARS["t"] = next_((0, plane.getGrid(_VARS["dims"][0], _VARS["dims"][1]), plane.getPassengers(_VARS["dims"][0],
     #                    _VARS["dims"][1], _VARS["dims"][2], _VARS["pt"], _VARS["p_opts"])))
     
-    _VARS["plane"] = Plane(_VARS["plane"].m, _VARS["plane"].n, _VARS["plane"].corridors)
+    _VARS["plane"] = Plane(_VARS["plane"].m, _VARS["plane"].n, _VARS["plane"].corridors, _VARS['p_opts']['columns_lengths'])
     createPassengers(_VARS["plane"], _VARS["pt"], _VARS["p_opts"])
     
     _VARS["end"] = False
@@ -212,7 +211,7 @@ def drawGrid(grid):
     for column in range(m):
         if len(grid[column]) < n:
             for row in range(n - len(grid[column])):
-                drawRect(column, n - (row+1), (255, 255, 255))
+                drawRect(column, n - (row+1), GREY)
 
     # add labels
     for i in range(m):
