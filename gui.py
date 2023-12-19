@@ -1,3 +1,5 @@
+import os
+import shutil
 from Plane import Plane
 from boarding import createPassengers, next_boarding_turn
 
@@ -276,6 +278,11 @@ def checkEvents():
 
 
 if __name__ == '__main__':
+    
+    # create config if not existent - copy defaultConfig.txt to config.txt
+    if not os.path.exists("config.txt"):
+        shutil.copyfile("defaultConfig.txt", "config.txt")
+    
     # load config
     config = configparser.RawConfigParser()
     configFilePath = r'config.txt'
